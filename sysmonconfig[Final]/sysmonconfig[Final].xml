@@ -1,0 +1,548 @@
+<!-- ATTENTION: Useful note for a successful sysmon config.xml Configuration file validation and update!!! -->
+
+<!--You need to execute the cmd with Admin rights and insert the command "sysmon -c C:\Users\User\Desktop\sysmonconfig.xml" (SOS quotes should be excluded!!!)-->
+
+<!-- ATTENTION: The provided information regarding features and utilities of System Monitor (Sysmon), that follow, were mainly based on the context provided in the official Microsoft sysmon online page which could be found in the provided link https://docs.microsoft.com/en-us/sysinternals/downloads/sysmon#event-id-1-process-creation. -->
+
+<!-- Sysmon is the abbreviation standing for System Monitor, the utility tool developed by Mark Russinovich that was registered in a Windows box as a system service - device driver and implemented as part of the Sysinternals suite. It is one of the most practically applicable and versatile Windows monitoring tools, which at the same time is fully customizable by their users through the xml manipulation of a config.xml file. According to Microsoft: "System Monitor (Sysmon) is a Windows system service and device driver that, once installed on a system, remains resident across system reboots to monitor and log system activity to the Windows event log. It provides detailed information about process creations, network connections, and changes to file creation time.". Throught the collection of numerous events within its log filesystem, malicious or potentially anomalous activity could be identified giving great insight regarding the rationale and patterns that follow the behaviour of intruders or malware operands. -->
+
+<!-- Brief Description of Sysmon Capabilities -->
+
+	<!-- - Logging of the creation of processes with the use of ProcessCreate rule tag.
+	- Logging the hashes of the various process images with the default configuration of MD5, SHA256 and IMPHASH hashing algorithms. 
+	- Parallel usage of multiple hashing algorithms at the same time.
+	- Permits the correlation of events when Windows reuses process GUID in process event's IDs.  
+	- Allows event correlation of events of the same logon session. 
+	- Logging of drivers and DLLs, along with their signatures and hashes.
+	- Logs opens for raw read access of disks and volumes.
+	- Optionally logging of network connection’s source process, IP addresses, port numbers, hostnames and port names.
+	- Detects changes in file creation time to understand when a file was really created. Modification of file create timestamps is a technique commonly used by malware to cover its tracks.
+	- Monitors the registry for unwanted changes and automatically reloads configurations.
+	- Dynamic event filtering with "include" or "exclude" statements for certain events.
+	- Event generation from the initial boot process to capture activity made by even zero-day advanced kernel-mode malware. -->
+
+<!-- 
+Common Usage Featuring command-line (cmd.exe) Options (https://docs.microsoft.com/en-us/sysinternals/downloads/sysmon):
+
+	Install: sysmon64 -i [<configfile>]
+	Update configuration: sysmon64 -c [<configfile>]
+	Install event manifest: sysmon64 -m
+	Print schema: sysmon64 -s
+	Uninstall: sysmon64 -u [force]
+
+Parameter		Description
+  -i			Install service and driver. Optionally take a configuration file.
+  -c			Update configuration of an installed Sysmon driver or dump the current configuration if no other argument is provided. Optionally takes a configuration file.
+  -m			Install the event manifest (implicitly done on service install as well).
+  -s			Print configuration schema definition.
+  -u			Uninstall service and driver. Using -u force causes uninstall to proceed even when some components are not installed.
+
+Useful Command Example to get used with sysmon Installation and Configuration process:
+
+Install with default settings (process images hashed with SHA1 and no network monitoring): sysmon -accepteula -i
+
+Install Sysmon with a configuration file (as described below): sysmon -accepteula -i c:\windows\config.xml
+
+Uninstall: sysmon -u
+
+Dump the current configuration: sysmon -c
+
+Reconfigure an active Sysmon with a configuration file (as described below): sysmon -c c:\windows\config.xml
+
+Reconfigure an active Sysmon with a configuration file (as described below): sysmon -c "PAY ATTENTION!!!: Two dashes without gap should follow the command sysmon -c" 
+
+Reconfigure an active Sysmon with a configuration file (as described below): sysmon -s
+
+Event List [IDs and Descriptions]
+
+Event ID 1: Process creation provides extended information about a newly created process.
+
+Event ID 2: Process changed a file creation time is registered when a file creation time is explicitly modified by a process.
+
+Event ID 3: Network connection is disabled by default. This event provides logging for all the TCP/UDP connections on the machine.
+
+Event ID 4: Sysmon service state changed, logs the changes of the Sysmon's state as a service (starts and stops of the service are also logged.).
+
+Event ID 5: Process terminated (The UtcTime, ProcessGuid and ProcessId of each process is provided.)
+
+Event ID 6: Driver loaded events log the loading of different drivers on the system.
+
+Event ID 7: Image loaded event is disabled by default. With this event the loading of specific processes is logged. 
+
+Event ID 8: CreateRemoteThread event detects when a process creates a thread in another process.
+
+Event ID 9: RawAccessRead event detects when a process conducts reading operations from the drive using the \\.\ denotation. This technique is often used by malware for data exfiltration of files that are locked for reading, as well as to avoid file access auditing tools. The event indicates the source process and target device.
+
+Event ID 10: ProcessAccess event logs when a process opens another process, an operation that’s often followed by information queries or reading and writing the address space of the target process.
+
+Event ID 11: FileCreate events are logged during and after the creation or overwritting of a file.
+
+Event ID 12: RegistryEvent (Object create and delete) events are useful for monitoring changes to Registry autostart locations.
+-->
+
+<Sysmon schemaversion="13.30">
+
+	<!--SYSMON META CONFIG-->
+
+	<!-- Both MD5 and SHA256 are the industry-standard algorithms. IMPHASH for DLL import fingerprinting. -->
+
+	<HashAlgorithms>md5,sha256,IMPHASH</HashAlgorithms> 
+
+	<!-- Check loaded drivers, log if their code-signing certificate has been revoked, in case malware stole one to sign a kernel driver -->
+
+	<CheckRevocation/> 
+
+	<EventFiltering>
+
+	<!-- RuleGroup commands that follow are related to the sysmon's rules initialization toward the identification of the Pass the Hass (PtH), Pass the Ticket (PtT) attacks, executed via the Mimikatz penetration testing tool. -->
+
+	<!--SYSMON EVENT ID 1 : PROCESS CREATION [ProcessCreate]-->
+
+		<!--DATA: RuleName, UtcTime, ProcessGuid, ProcessID, Image, FileVersion, Description, Product, Company, CommandLine, CurrentDirectory, User, LogonGuid, LogonId, TerminalSessionId, IntegrityLevel, Hashes, ParentProcessGuid, ParentProcessId, ParentImage, ParentCommandLine-->
+
+	<RuleGroup name="Sysmon_Event_1(ProcessCreate)" groupRelation="or">
+
+		<!-- NOTE: During the creation of this first version (v1) of the sysmon configuration xml file (config.xml), specifically oriented to detect Lateral Movement Attacks, we included only EVENTS 1, 3 and 5. This decision was driven by the concucted experiments of the most known Lateral Movement Attacks (namely Pass the Hass, Pass the Ticket, Golden Ticket, Silver Ticket, ) and the extensive study of the collected Sysmon log files after the completion of each attack. The future versions the our custom config.xml sysmon file, will fill any gaps of settings that were initially ommitted. -->
+
+		<!-- SECTION ProcessCreate -->
+
+		<!-- ProcessCreate name="conhost.exe" -->
+
+		<ProcessCreate onmatch="include">
+			<CommandLine condition="contains">C:\Windows\system32\conhost.exe 0xffffffff -ForceV1</CommandLine>
+			<ParentCommandLine condition="is">C:\Windows\system32\wevtutil.exe install-manifest "C:\ProgramData\Microsoft\Windows Defender\Platform\4.18.2110.6-0\Microsoft-Antimalware-Protection.man" "/resourceFilePath:C:\ProgramData\Microsoft\Windows Defender\Platform\4.18.2110.6-0\MpClient.dll" "/messageFilePath:C:\ProgramData\Microsoft\Windows Defender\Platform\4.18.2110.6-0\MpClient.dll" "/parameterFilePath:C:\ProgramData\Microsoft\Windows Defender\Platform\4.18.2110.6-0\MpClient.dll"</ParentCommandLine>
+			<Image name="conhost" condition="is">C:\Windows\System32\conhost.exe</Image>
+			<Image name="conhost" condition="end with">.exe</Image>
+			<ParentImage condition="is">C:\Windows\System32\cmd.exe</ParentImage>
+			<ParentImage condition="is">C:\Windows\System32\wevtutil.exe</ParentImage>
+			<CurrentDirectory condition="is">C:\Windows\</CurrentDirectory>
+			<Description condition="is">Console Window Host</Description>
+			 <!--Console Window Host-->
+		</ProcessCreate>
+
+		<!-- ProcessCreate name="ping.exe" -->
+
+		<ProcessCreate onmatch="exclude">
+			<CommandLine condition="contains">ping 192.168.1.6</CommandLine>
+			<Image name="ping" condition="is">C:\Windows\System32\PING.EXE</Image>
+			<Image name="ping" condition="end with">.exe</Image>
+			<ParentImage condition="is">C:\Windows\System32\cmd.exe</ParentImage>
+			<CurrentDirectory condition="is">C:\Users\Administrator\Desktop\</CurrentDirectory>
+			<Description condition="is">TCP/IP Ping Command</Description>
+			<!--TCP/IP Ping Command-->
+		</ProcessCreate>
+
+		<!-- ProcessCreate name="cmd.exe" -->
+
+		<ProcessCreate onmatch="include">
+			<CommandLine condition="contains">cmd</CommandLine> 
+			<Image name="cmd" condition="is">C:\Windows\System32\cmd.exe</Image>
+			<ParentCommandLine condition="is">C:\Windows\system32\cmd.exe /d /c C:\Windows\system32\silcollector.cmd configure</ParentCommandLine>
+			<Image name="cmd" condition="end with">.exe</Image>
+			<ParentImage condition="is">C:\Windows\PSEXESVC.exe</ParentImage>
+			<CurrentDirectory condition="is">C:\Windows\system32\</CurrentDirectory>
+			<Description condition="is">Windows Command Processor</Description>
+			<!--Windows Command Processor-->
+		</ProcessCreate>
+
+		<!-- ProcessCreate name="DllHost.exe" - COM Surrogate Microsoft Windows Operating System -->
+			
+		<ProcessCreate onmatch="include">
+			<CommandLine condition="contains">C:\Windows\system32\DllHost.exe /Processid:{E10F6C3A-F1AE-4ADC-AA9D-2FE65525666E}</CommandLine> 
+			<CommandLine condition="contains">C:\Windows\system32\DllHost.exe /Processid:{E10F6C3A-F1AE-4ADC-AA9D-2FE65525666E}</CommandLine> 
+			<Image name="dllhost" condition="is">C:\Windows\System32\dllhost.exe</Image>
+			<Image name="dllhost" condition="end with">.exe</Image>
+			<ParentImage condition="is">C:\Windows\System32\svchost.exe</ParentImage>
+			<CurrentDirectory condition="is">C:\Windows\system32\</CurrentDirectory>
+			<Description condition="is">COM Surrogate</Description>
+			<!--COM Surrogate Microsoft Windows Operating System-->
+		</ProcessCreate>
+
+		<!-- ProcessCreate name="ipconfig.exe" - COM Surrogate Microsoft Windows Operating System -->
+
+		<ProcessCreate onmatch="include">
+			<CommandLine condition="contains">ipconfig</CommandLine> 
+			<Image name="ipconfig" condition="is">C:\Windows\System32\ipconfig.exe</Image>
+			<Image name="ipconfig" condition="end with">.exe</Image>
+			<ParentImage condition="is">C:\Windows\System32\cmd.exe</ParentImage>
+			<CurrentDirectory condition="is">C:\Users\Administrator\Desktop\</CurrentDirectory>
+			<Description condition="is">IP Configuration Utility</Description>
+			<!--COM Surrogate Microsoft Windows Operating System-->
+		</ProcessCreate>
+
+		<!-- ProcessCreate name=("cmd.exe", "mimikatz.exe", "psexec.exe", "pskill.exe", "wmiprvse.exe", "sppsvc.exe") -->
+
+		<!-- The existence of the command line tools mentioned in the ProcessCreate rule that follows, is one of the most obvious proofs that acts as an alert for Lateral Movement Attack with the use of Powershell Injection Persistence Bypass. -->
+
+		<ProcessCreate onmatch="include">
+			<CommandLine condition="contains">cmd.exe</CommandLine> 
+			<Image name="Mimikatz Execution" condition="is">C:\Windows\System32\cmd.exe</Image>
+			<Image name="Mimikatz Execution" condition="end with">.exe</Image>
+			<ParentImage condition="is">C:\Users\Administrator\Desktop\mimikatz_trunk\x64\mimikatz.exe</ParentImage>
+			<ParentCommandLine condition="is">C:\Users\Administrator\Desktop\mimikatz_trunk\x64\mimikatz.exe</ParentCommandLine>
+			<CurrentDirectory condition="is">C:\Windows\system32\</CurrentDirectory>
+			<Description condition="is">Windows Command Processor</Description>
+			<ParentImage name="Child Process of psexec" condition="image">psexesvc.exe</ParentImage>
+			<Description name="PSexec Execution" condition="contains">Execute processes remotely</Description>
+			<ParentImage name="PSexec Execution" condition="image">psexec.exe</ParentImage>
+			<Description name="PSexec Execution" condition="contains">Execute processes remotely</Description>
+			<ParentImage name="PSKill Execution" condition="image">pskill.exe</ParentImage>
+			<CommandLine name="Powershell Injection Persistence Bypass" condition="contains">System.Management.Automation</CommandLine>
+			<ParentImage name="wmiprvse Lateral Movement Hacking Alert" condition="image">wmiprvse.exe</ParentImage>
+			<!--PSexec - Mimikatz Windows Command Processor - Powershell Injection Persistence Bypass - wmiprvse.exe alert for Lateral Movement Attack Alert.-->
+			<Image condition="is">C:\Windows\system32\sppsvc.exe</Image> <!--Microsoft:Windows: Software Protection Service-->
+		</ProcessCreate>
+
+		<!-- ProcessCreate name="lsass.exe" -->
+		<!-- ProcessCreate name="svchost.exe" -->
+		<!-- ProcessCreate name="reg.exe" -->
+		<!-- ProcessCreate name="cmd.exe" -->
+		<!-- ProcessCreate name="wininit.exe" -->
+		<!-- ProcessCreate name="services.exe" -->
+
+		<!-- Local Security Authority Process and Registry Console Tool are monitored with the use of the aforementioned ProcessCreate rules, acting as the main axis of our methodology towards the identification of Lateral Movement Privilege Escalation and Persistense Attacks. -->
+				
+		<ProcessCreate onmatch="include">
+			<CommandLine condition="contains">C:\Windows\system32\lsass.exe</CommandLine> <!-- Possible indication for the execution of the Lateral Movement Skeleton Key Attack -->
+			<CommandLine condition="contains">C:\Windows\system32\svchost.exe -k RPCSS -p</CommandLine>
+			<CommandLine condition="contains"> C:\Windows\system32\svchost.exe -k netsvcs -p -s wuauserv</CommandLine>
+			<CommandLine condition="contains">C:\Windows\system32\reg.exe  query hklm\software\microsoft\windows\softwareinventorylogging /v collectionstate /reg:64</CommandLine> <!-- Indication of a potential attemp to alterate registry regords. -->
+			<CommandLine condition="contains">C:\Windows\system32\svchost.exe -k UnistackSvcGroup -s CDPUserSvc</CommandLine>
+			<ParentCommandLine condition="is">C:\Windows\system32\cmd.exe /c C:\Windows\system32\reg.exe query hklm\software\microsoft\windows\softwareinventorylogging /v collectionstate /reg:64</ParentCommandLine> <!-- Indication of a potential attemp to alterate registry regords. -->
+			<Image name="lsass ProcessCreate" condition="is">C:\Windows\system32\lsass.exe</Image>
+			<Image name="svchost ProcessCreate" condition="is">C:\Windows\System32\svchost.exe</Image>
+			<Image name="ProcessCreate" condition="end with">.exe</Image>
+			<Image name="reg64 ProcessCreate" condition="is">C:\Windows\System32\reg.exe</Image>
+			<ProcessId condition="is">668</ProcessId>
+			<ProcessId condition="is">960</ProcessId>
+			<ParentImage condition="is">C:\Windows\System32\wininit.exe</ParentImage>
+			<ParentImage condition="is">C:\Windows\System32\services.exe</ParentImage>
+			<CurrentDirectory condition="is">C:\Windows\System32\wininit.exe</CurrentDirectory>
+			<Description condition="is">Local Security Authority Process</Description>
+			<Description condition="is">Registry Console Tool</Description>
+			<!--Local Security Authority Process, Registry Console Tool-->
+
+		<!-- ProcessCreate name="whoami.exe" -->
+
+		<!-- whoami.exe ProcessCreate rule was included to cover the case of a malicious user who gained access to one host with low priviledges and tries to escalate to other accounts revealing their administrative priviledges of their accounts. -->
+
+		</ProcessCreate>
+		<ProcessCreate onmatch="include">
+			<ProcessId condition="is">3876</ProcessId>
+			<Image name="whoami.exe" condition="is">C:\Windows\System32\whoami.exe</Image>
+			<Description condition="is">whoami - displays logged on user information</Description>
+			<CommandLine condition="is">whoami</CommandLine>
+			<ParentImage condition="is">C:\Windows\System32\cmd.exe</ParentImage>
+			<ParentCommandLine condition="is">"cmd"</ParentCommandLine>
+			<Image name="wwwroot" condition="is">\wwwroot\</Image>
+			<Image name="MpCmdRun.exe" condition="is">MpCmdRun.exe</Image>
+			<Image name="whoami.exe" condition="is">C:\Windows\System32\whoami.exe</Image>
+			<Image name="whoami.exe" condition="is">C:\Windows\System32\whoami.exe</Image>
+			<Image name="whoami.exe" condition="is">C:\Windows\System32\whoami.exe</Image>
+		</ProcessCreate>
+
+		<!-- ProcessCreate name="klist.exe" -->
+
+		<!-- The ProcessCreate rule with Description "Tool for managing the Kerberos ticket cache" was included as one of the most obvious proofs of the execution of Kerberos tickets related Lateral Movement attacks, such as Pass the Hash, Pass the Ticket, Golden Ticket, Silver Ticket. -->
+
+		<ProcessCreate onmatch="include">
+			<ProcessId condition="is">4196</ProcessId>
+			<Description condition="is">Tool for managing the Kerberos ticket cache</Description>
+			<CommandLine condition="is">klist</CommandLine>
+			<CurrentDirectory condition="contains">C:\Users\Administrator\</CurrentDirectory>
+			<Image name="klist" condition="is">C:\Windows\System32\klist.exe</Image>
+			<ParentImage condition="is">C:\Windows\System32\cmd.exe</ParentImage>	
+			<ParentCommandLine condition="is">C:\Windows\system32\cmd.exe</ParentCommandLine>
+		</ProcessCreate>
+
+		<!-- ProcessCreate name="lazagne.exe" -->
+
+		<!-- The ProcessCreate rule ProcessCreate name="lazagne.exe" was included to outline the execution of password spoofing Lateral Movement Attack with the use of the popular penetration framework LaZagne Project. Many attempts have been made for passwords to be spoofed from Windows 2019 Server's client's windows accounts, sysadmin, mails, databases etc. -->
+
+		<ProcessCreate onmatch="include">
+			<ProcessId condition="is">5820</ProcessId>
+			<ProcessId condition="is">3868</ProcessId>
+			<ProcessId condition="is">4648</ProcessId>
+			<ProcessId condition="is">648</ProcessId>
+			<ProcessId condition="is">3368</ProcessId>
+			<ProcessId condition="is">3052</ProcessId>
+			<Description condition="is">Windows Command Processor</Description>
+			<CommandLine condition="is">cmd.exe /c "reg.exe save hklm\sam c:\windows\temp\tnaccemjxu"</CommandLine>
+			<CommandLine condition="is">cmd.exe /c "reg.exe save hklm\sam c:\windows\temp\dvtkrw"</CommandLine>
+			<CommandLine condition="is">cmd.exe /c "reg.exe save hklm\sam c:\windows\temp\ukmqgzbsngp"</CommandLine>
+			<CommandLine condition="is">cmd.exe /c "reg.exe save hklm\sam c:\windows\temp\oidhznkpqtm"</CommandLine>
+			<CommandLine condition="is">cmd.exe /c "reg.exe save hklm\system c:\windows\temp\szqfdeshe"</CommandLine>
+			<CurrentDirectory condition="contains">C:\Users\Administrator\Downloads\</CurrentDirectory>
+			<Image name="lazagne" condition="is">C:\Windows\System32\cmd.exe</Image>
+			<Image name="lazagne" condition="is">C:\Users\Administrator\Downloads\lazagne.exe</Image>
+			<ParentImage condition="is">C:\Users\Administrator\Downloads\lazagne.exe</ParentImage>	
+			<ParentCommandLine condition="is">lazagne.exe  windows</ParentCommandLine>
+			<ParentCommandLine condition="is"> lazagne.exe  sysadmin</ParentCommandLine>
+			<ParentCommandLine condition="is"> lazagne.exe  mails</ParentCommandLine>
+			<ParentCommandLine condition="is"> lazagne.exe  project mails</ParentCommandLine>
+			<ParentCommandLine condition="is"> lazagne.exe  project databases</ParentCommandLine>
+			<ParentCommandLine condition="is"> lazagne.exe  project windows</ParentCommandLine>
+			<ParentCommandLine condition="is"> lazagne.exe  project all</ParentCommandLine>
+			<OriginalFileName condition="contains"> C:\Windows\system32\cmd.exe</OriginalFileName>			
+			<LogonId condition="is">{27532e6a-2ce7-61af-e703-000000000000}</LogonId>
+		</ProcessCreate>
+
+		<!-- ProcessCreate / CommandLine name="Privilege Escalation" -->
+
+		<!-- This ProcessCreate rule is dedicated to the identification of Privilege Escalation offensive attempts of malicious users as the first step for the execution of Lateral Movement attacks. -->
+
+		<!-- Privilege Escalation is defined as the attack that involves gaining elevated user privileges beyond the legal rights that were acquired to the compromised user account. This attack could be executed from a malicious person acting as an insider or outsider of the local network under attack. -->
+
+		<ProcessCreate onmatch="include">
+			<!--Hacking Command Line Events - Privilege Escalation attempts with various techniques.-->
+			<CommandLine name="Privilege Escalation" condition="contains">sdelete</CommandLine> <!-- Deletes a file after overwriting it several times. This tool is used to delete a file created in the course of an attack to make recovery impossible. -->
+			<CommandLine name="Privilege Escalation" condition="contains">sekurlsa</CommandLine> <!-- mimikatz > sekurlsa::logonpasswords, Password and Hash Dump -->
+			<CommandLine name="Privilege Escalation" condition="contains">reg SAVE</CommandLine> <!-- Saves a copy of specified subkeys, entries, and values of the registry in a specified file. -->
+			<CommandLine name="Privilege Escalation" condition="contains">Invoke-DllInjection</CommandLine> <!-- DLL injection is a technique which allows an attacker to run arbitrary code in the context of the address space of another process. -->
+			<CommandLine name="Privilege Escalation" condition="contains">Invoke-Shellcode</CommandLine> <!-- Shellcode is a set of instructions that executes a command in software to take control of or exploit a compromised machine. -->
+			<CommandLine name="Privilege Escalation" condition="contains">Invoke-WmiCommand</CommandLine> <!-- Invoke-WmiCommand executes a PowerShell ScriptBlock on a target computer using WMI as a pure C2 channel. -->
+			<CommandLine name="Privilege Escalation" condition="contains">Get-Keystrokes</CommandLine> <!-- Keystroke logging, often referred to as keylogging or keyboard capturing, is the action of logging keys pressed, time and the active window. -->
+			<CommandLine name="Privilege Escalation" condition="contains">Get-TimedScreenshot</CommandLine> <!-- Takes screenshots and saves them to a folder, with a timestamp to reveal the time and date of the screenshot. -->
+			<CommandLine name="Privilege Escalation" condition="contains">Get-VaultCredential</CommandLine> <!-- Displays Windows vault credential objects including cleartext web credentials. -->
+			<CommandLine name="Privilege Escalation" condition="contains">Invoke-CredentialInjection</CommandLine> <!-- Displays Windows vault credential objects including cleartext web credentials. -->
+			<CommandLine name="Privilege Escalation" condition="contains">mimikatz</CommandLine> <!-- Mimikatz is an open-source application that allows users to view and save authentication credentials like Kerberos tickets. -->
+			<CommandLine name="Privilege Escalation" condition="contains">Add-ScrnSaveBackdoor</CommandLine> <!-- Screensaver Backdoor. Metasploit web delivery module can be used to generate and host the PowerShell payload in this scenario. -->
+			<CommandLine name="Privilege Escalation" condition="contains">Enabled-DuplicateToken</CommandLine> <!-- DuplicateToken function creates a new access token that duplicates one already in existence. -->
+			<CommandLine name="Privilege Escalation" condition="contains">Invoke-PsUaCme</CommandLine> <!-- Bypassing UAC with PowerShell -->
+			<CommandLine name="Privilege Escalation" condition="contains">Remove-Update</CommandLine> <!-- Removing updates may compromise the system to potential zero-days or exploits. -->
+			<CommandLine name="Privilege Escalation" condition="contains">Check-VM</CommandLine> <!-- Checks the existense of virtual machines that could be used to escalate the attacker to the physical target system. -->
+			<CommandLine name="Privilege Escalation" condition="contains">Get-SiteListPassword</CommandLine> <!-- Retrieves the plaintext passwords for found McAfee's SiteList.xml files. Based on Jerome Nokin (@funoverip)'s Python solution (in links) - (https://gitlab.austinoneil.com/aoneil/sec-toolkit/-/blob/master/windows/empire/data/module_source/privesc/Get-SiteListPassword.ps1). -->
+			<CommandLine name="Privilege Escalation" condition="contains">Get-System</CommandLine> <!-- Metalsploit's meterpreter getsystem command elevates you from a local administrator to the SYSTEM user. -->
+			<CommandLine name="Privilege Escalation" condition="contains">BypassUAC</CommandLine> <!-- Performs the bypass UAC attack by utilizing the trusted publisher. -->
+			<CommandLine name="Privilege Escalation" condition="contains">Invoke-Tater</CommandLine> <!-- Invoke-Tater is a PowerShell implementation of the Hot Potato Windows Privilege Escalation with functionality (https://github.com/EmpireProject/Empire/blob/master/data/module_source/privesc/Invoke-Tater.ps1). -->
+			<CommandLine name="Privilege Escalation" condition="contains">PowerUp</CommandLine> <!-- PowerUp is a PowerShell tool to assist with local privilege escalation on Windows systems. It contains several methods to identify and abuse vulnerable services, as well as DLL hijacking opportunities, vulnerable registry settings, and escalation opportunities. It is part of PowerTools and resides at https://github.com/PowerShellEmpire/PowerTools/tree/master/PowerUp. -->
+			<CommandLine name="Privilege Escalation" condition="contains">Get-LSASecret</CommandLine> <!-- Nishang script which extracts LSA Secrets from local computer (https://github.com/samratashok/nishang/blob/master/Gather/Get-LSASecret.ps1). -->
+			<CommandLine name="Privilege Escalation" condition="contains">psscan</CommandLine> <!-- psscan psscan is a useful plugin that allows the analyst to examine processes that have been terminated. --> 
+			<CommandLine name="Privilege Escalation" condition="contains">Invoke-PowerShellWMI</CommandLine> <!-- Invoke-WmiCommand executes a PowerShell ScriptBlock on a target computer using WMI as a pure C2 channel. -->
+			<CommandLine name="Privilege Escalation" condition="contains">Add-Exfiltration</CommandLine> <!-- Data exfiltration occurs when malware and/or a malicious actor carries out an unauthorized data transfer from a computer. -->
+			<CommandLine name="Privilege Escalation" condition="contains">Add-Persistence</CommandLine> <!-- Add persistence capabilities to a script. -->
+			<CommandLine name="Privilege Escalation" condition="contains">wmic shadowcopy delete</CommandLine> <!-- wmic.exe is usually used for shadow copy deletion on endpoints. This commonly occurs in tandem with ransomware or other destructive attacks. -->
+			<CommandLine name="Privilege Escalation" condition="contains">wbadmin delete catalog</CommandLine> <!-- Identifies use of the wbadmin.exe to delete the backup catalog. Ransomware and other malware may do this to prevent system recovery. -->
+			<CommandLine name="Privilege Escalation" condition="contains">/set {default} recoveryenabled no</CommandLine> <!-- Disable auto-repair at startup. -->
+			<CommandLine name="Privilege Escalation" condition="contains">telnet</CommandLine> <!-- Reveals remote connections. -->
+			<CommandLine name="Privilege Escalation" condition="contains">-dumpcr</CommandLine> <!-- Related to Mimikatz use for privilege escalation and gain of legitimate user passwords. --> 
+			<CommandLine name="Privilege Escalation" condition="contains">putty</CommandLine> <!-- Reveals remote connections. -->
+			<CommandLine name="Privilege Escalation" condition="contains">bash.exe</CommandLine> <!-- Reveals the use of bash terminal from a windows account. -->
+			<CommandLine name="Privilege Escalation" condition="contains">pssh</CommandLine> <!-- Reveals remote connections. -->
+			<CommandLine name="Privilege Escalation" condition="contains"> Invoke-NinjaCopy</CommandLine> <!-- This script can copy files off an NTFS volume by opening a read handle to the entire volume (such as c:) and parsing the NTFS structures. This requires you are an administrator of the server (https://github.com/PowerShellMafia/PowerSploit/blob/master/Exfiltration/Invoke-NinjaCopy.ps1). -->
+			<CommandLine name="Privilege Escalation" condition="contains">Invoke-TokenManipulation</CommandLine> <!-- Enumerates logon tokens and use them to recreate processes or create new ones (https://github.com/PowerShellMafia/PowerSploit/blob/master/Exfiltration/Invoke-TokenManipulation.ps1). --> 
+			<CommandLine name="Privilege Escalation" condition="contains">Out-Minidump</CommandLine> <!-- Small file that is saved to your computer each time the computer stops unexpectedly, for example when you get a BSoD. -->
+			<CommandLine name="Privilege Escalation" condition="contains">VolumeShadowCopyTools</CommandLine> <!-- VShadow is a command-line tool that you can use to create and manage volume shadow copies. -->
+			<CommandLine name="Privilege Escalation" condition="contains">Invoke-ReflectivePEInjection</CommandLine> <!-- Invoke-ReflectivePEInjection of DDL/EXE to the powershell (https://www.powershellgallery.com/packages/PowerSploit/3.0.0.0/Content/CodeExecution%5CInvoke-ReflectivePEInjection.ps1). -->
+			<CommandLine name="Privilege Escalation" condition="contains">Invoke-DowngradeAccount</CommandLine> <!-- Removing updates may compromise the system to potential zero-days or exploits. --> 
+			<CommandLine name="Privilege Escalation" condition="contains">Get-ServiceUnquoted</CommandLine> <!-- Sometimes it is possible to escalate privileges by abusing misconfigured services. Specifically, this is possible if path to the service binary is not wrapped in quotes and there are spaces in the path. -->
+			<CommandLine name="Privilege Escalation" condition="contains">Get-VulnSchTask</CommandLine> <!-- find schtasks with modifiable target files -->
+			<CommandLine name="Privilege Escalation" condition="contains">Get-WebConfig</CommandLine> <!-- checks for any encrypted web.config strings -->
+			<CommandLine name="Privilege Escalation" condition="contains">Get-ServiceFilePermission</CommandLine> <!-- returns services where the current user can write to the service binary path or its config -->
+			<CommandLine name="Privilege Escalation" condition="contains">Get-ServicePermission</CommandLine> <!-- returns services the current user can modify -->
+			<CommandLine name="Privilege Escalation" condition="contains">Invoke-ServiceAbuse</CommandLine> <!-- modifies a vulnerable service to create a local admin or execute a custom command -->
+			<CommandLine name="Privilege Escalation" condition="contains">Get-RegAutoLogon</CommandLine> <!-- checks for Autologon credentials in the registry -->
+			<CommandLine name="Privilege Escalation" condition="contains">Get-Unconstrained</CommandLine> <!-- Nishang script which searches computers in current domain which have Unconstrained Delegation Enabled (https://github.com/jajp777/Powershell-35/blob/master/nishang-master/ActiveDirectory/Get-Unconstrained.ps1). -->
+			<CommandLine name="Privilege Escalation" condition="contains">Add-RegBackdoor</CommandLine> <!-- Nishang Script which could set Debugger registry keys for Sticky Keys (sethc.exe) and Utilman (utilman.exe) to remotely execute commands and scripts (https://github.com/samratashok/nishang/blob/master/Backdoors/Add-RegBackdoor.ps1). --> 
+			<CommandLine name="Privilege Escalation" condition="contains">Get-PassHashes</CommandLine> <!-- Nishang payload which dumps password hashes (https://github.com/samratashok/nishang/blob/master/Gather/Get-PassHashes.ps1). --> 
+			<CommandLine name="Privilege Escalation" condition="contains">Show-TargetScreen</CommandLine> <!-- Nishang script which can be used for streaming a target's desktop using MJPEG (https://github.com/samratashok/nishang/blob/master/Gather/Show-TargetScreen.ps1). -->
+			<CommandLine name="Privilege Escalation" condition="contains">Port-Scan</CommandLine> <!-- Target reconnaissance phase. -->
+			<CommandLine name="Privilege Escalation" condition="contains">netscan</CommandLine> <!-- Target reconnaissance phase. -->
+
+		<!-- <ProcessCreate onmatch="exclude"> -->
+
+		<!-- The ProcessCreate that follows includes the most common processes of windows that should be excluded to avoid the cause of unwanted noise to the sysmon event filtering. --> 
+
+		</ProcessCreate>
+		<ProcessCreate onmatch="exclude">
+			<!--COMMENT: Exclude mostly-safe sources and log anything else.-->
+			<Image name="wininit" condition="is">C:\Windows\system32\wininit.exe</Image> <!-- The genuine wininit.exe file is a software component of Microsoft Windows Operating System by Microsoft Corporation. -->
+			<Image name="csrss" condition="is">C:\Windows\system32\csrss.exe</Image> <!-- Csrss.exe (also known as Client Service Runtime Process) is a legitimate and important process that runs in Windows Operating Systems. -->
+			<Image name="winlogon" condition="is">C:\Windows\system32\winlogon.exe</Image> <!-- Very important part of the Windows operating system, and Windows will be unusable without it. -->
+			<Image name="audiodg" condition="is">C:\Windows\system32\audiodg.exe</Image> <!-- The process audiodg.exe is for Windows Audio Device Graph Isolation. -->
+			<Image name="chrome" condition="is">Google\Chrome\Application\chrome.exe</Image> <!-- google's chrome should be excluded. -->
+			<Image name="msvsmon" condition="is">C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\Common7\IDE\Remote Debugger\x64\msvsmon.exe</Image> <!-- msvsmon.exe is an executable file on your computer's hard drive. -->
+			<Image name="WmiPrvSE" condition="is">C:\Windows\system32\wbem\WmiPrvSE.exe</Image>
+			<Image name="TrustedInstaller" condition="is">C:\Windows\servicing\TrustedInstaller.exe</Image> <!--Microsoft:Windows: TrustedInstaller-->
+			<Image name="WmiPrvSE" condition="is">C:\Windows\system32\wbem\WmiPrvSE.exe</Image> <!-- WmiPrvSE is the acronym for Windows Management Instrumentation Provider Service. -->
+			<Image name="spoolsv" condition="is">C:\Windows\system32\spoolsv.exe</Image> <!-- spoolsv.exe runs the Windows OS print spooler service. -->
+			<Image name="MsMpEng" condition="is">C:\Program Files\Windows Defender\MsMpEng.exe</Image> <!-- Msmpeng.exe stands for Microsoft Malware Protection Engine.  -->
+			<Image name="ShellExperienceHost" condition="is">C:\Windows\SystemApps\ShellExperienceHost_cw5n1h2txyewy\ShellExperienceHost.exe</Image> <!-- Windows Shell Experience Host is also known as ShellExperienceHost.exe. -->
+			<Image name="rundll32" condition="image">rundll32.exe</Image> <!--Microsoft:Windows: [ https://blog.cobaltstrike.com/2016/07/22/why-is-rundll32-exe-connecting-to-the-internet/ ] -->
+			<Image name="notepad" condition="image">notepad.exe</Image> <!--Microsoft:Windows: [ https://blog.cobaltstrike.com/2013/08/08/why-is-notepad-exe-connecting-to-the-internet/ ] -->
+			<Image name="backgroundTaskHost" condition="is">C:\Windows\System32\backgroundTaskHost.exe</Image>
+			<Image name="SearchUI" condition="is">C:\Windows\SystemApps\Microsoft.Windows.Cortana_cw5n1h2txyewy\SearchUI.exe</Image>
+			<Image name="mmc" condition="is">C:\Windows\System32\mmc.exe</Image>
+			<Image condition="is">C:\Windows\System32\wermgr.exe</Image> <!--Microsoft:Windows:Windows error reporting/telemetry-->
+			<Image condition="is">C:\Windows\system32\mobsync.exe</Image> <!--Microsoft:Windows: Network file syncing-->
+			<CommandLine condition="is">C:\Windows\system32\SearchIndexer.exe /Embedding</CommandLine> <!--Microsoft:Windows: Search Indexer-->
+			<Image condition="is">C:\Windows\system32\powercfg.exe</Image> <!--Microsoft:Power configuration management-->
+			<Image condition="is">C:\Windows\system32\sndVol.exe</Image> <!--Microsoft:Windows: Volume control-->
+			<Image condition="is">C:\Windows\system32\sppsvc.exe</Image> <!--Microsoft:Windows: Software Protection Service-->
+			<Image condition="is">C:\Windows\system32\wbem\WmiApSrv.exe</Image> <!-- Microsoft:Windows: WMI performance adapter host process-->
+			<Image condition="is">C:\Windows\System32\plasrv.exe</Image> <!--Microsoft:Windows: Performance Logs and Alerts DCOM Server-->
+			<Image condition="is">C:\Windows\System32\TokenBrokerCookies.exe</Image> <!--Microsoft:Windows: SSO sign-in assistant for MicrosoftOnline.com-->
+			<CommandLine condition="is">C:\windows\system32\wermgr.exe-queuereporting</CommandLine> <!--Microsoft:Windows:Windows error reporting/telemetry-->
+
+			<!--SECTION: Drivers-->
+
+			<!--COMMENT: Attackers sometimes hide themselves in the folders of drivers, only the most common driver processes should be excluded.-->
+
+			<CommandLine condition="begin with">"C:\Program Files\DellTPad\ApMsgFwd.exe" -s{</CommandLine> <!--Dell:Driver: routine actions-->
+			<CommandLine condition="is">C:\Windows\system32\igfxsrvc.exe -Embedding</CommandLine> <!--Dell:Driver: routine actions-->
+			<ParentImage condition="end with">C:\Program Files\DellTPad\HidMonitorSvc.exe</ParentImage> <!--Dell:Driver: routine actions-->
+			<ParentImage condition="end with">C:\Program Files\Realtek\Audio\HDA\RtkAudioService64.exe</ParentImage> <!--Realtek:Driver: routine actions-->
+			<ParentCommandLine condition="is">C:\windows\system32\wermgr.exe - queuereporting</ParentCommandLine> <!--Microsoft:Windows:Windows error reporting/telemetry-->
+			<CommandLine condition="begin with">"C:\Windows\system32\wermgr.exe" "-queuereporting_svc" </CommandLine> <!--Microsoft:Windows:Windows error reporting/telemetry-->
+			<CommandLine condition="is">C:\WINDOWS\system32\wermgr.exe -upload</CommandLine> <!--Microsoft:Windows:Windows error reporting/telemetry-->
+			<CommandLine condition="is">\SystemRoot\System32\smss.exe</CommandLine> <!--Microsoft:Bootup: Windows Session Manager-->
+
+		<!-- <ProcessCreate onmatch="exclude"> -->
+
+		<!-- sysmon and sysmon64 execution should be excluded and flagged as unwanted noise to be captured by the system monitor. --> 
+
+		</ProcessCreate>
+		<ProcessCreate onmatch="exclude">
+			<Image name="sysmon64" condition="is">C:\Windows\sysmon64.exe</Image>
+			<Image name="sysmon" condition="is">C:\Windows\sysmon.exe</Image>
+		</ProcessCreate>
+	</RuleGroup>
+
+	<!--SYSMON EVENT ID 3 : NETWORK CONNECTION INITIATED [NetworkConnect]-->
+
+		<!--DATA: RuleName, UtcTime, ProcessGuid, ProcessId, Image, User, Protocol, Initiated, SourceIsIpv6, SourceIp, SourceHostname, SourcePort, SourcePortName, DestinationIsIpV6, DestinationIp, DestinationHostname, DestinationPort, DestinationPortName-->
+
+	<!-- ProcessCreate name="lsass.exe" -->
+
+		<!-- lsass.exe is a clear indication for the execution of the Pass the Hash and Pass the Ticket attacks. When executed with the use of Mimikatz Event ID 3 and 10 are captured from the system monitor revealing the successfull access to the LSASS process of Windows. LSASS process is responsible for enforcing the robustness of the windows account's security policy. -->
+
+	<RuleGroup name="Sysmon_Event_3(NetworkConnect)" groupRelation="or">
+		<NetworkConnect onmatch="include">
+			<Image name="lsass" condition="is">C:\Windows\System32\lsass.exe</Image>
+			<Image name="lsass" condition="end with">.exe</Image>
+			<ProcessId condition="is">668</ProcessId>
+			<Protocol condition="contains">tcp</Protocol>
+			<SourcePort condition="is">64110</SourcePort>
+			<DestinationPort condition="is">389</DestinationPort>
+			<DestinationPortName condition="is">ldap</DestinationPortName>
+			<SourcePort condition="is">64111</SourcePort>
+			<SourcePort condition="is">64116</SourcePort>
+			<SourcePort condition="is">64117</SourcePort>
+			<SourcePort condition="is">64118</SourcePort>
+			<!--lsass.exe network connection detected-->
+		</NetworkConnect>
+
+		<!-- ProcessCreate name="svchost.exe" -->
+
+		<NetworkConnect onmatch="include">
+			<Image name="svchost" condition="is">C:\Windows\System32\svchost.exe</Image>
+			<Image name="svchost" condition="end with">.exe</Image>
+			<ProcessId condition="is">956</ProcessId>
+			<ProcessId condition="is">1472</ProcessId>
+			<Protocol condition="contains">tcp</Protocol>
+			<DestinationPort condition="is">135</DestinationPort>
+			<DestinationPortName condition="is">epmap</DestinationPortName>
+			<SourcePort condition="is">64115</SourcePort>
+			<SourcePort condition="is">64118</SourcePort>
+			<SourcePort condition="is">64119</SourcePort>
+			<!--svchost.exe network connection detected-->
+		</NetworkConnect>
+
+		<!-- ProcessCreate name="dfsrs.exe" -->
+
+		<NetworkConnect onmatch="include">
+			<Image name="dfsrs" condition="is">C:\Windows\System32\dfsrs.exe</Image>
+			<Image name="dfsrs" condition="end with">.exe</Image>
+			<ProcessId condition="is">368</ProcessId>
+			<Protocol condition="contains">tcp</Protocol>
+			<DestinationPort condition="is">389</DestinationPort>
+			<DestinationPortName condition="is">ldap</DestinationPortName>
+			<SourcePort condition="is">64116</SourcePort>
+			<SourcePort condition="is">64117</SourcePort>
+			<!--dfsrs.exe network connection detected-->
+		</NetworkConnect>
+
+		<!-- ProcessCreate name="dns.exe" -->
+
+		<NetworkConnect onmatch="exclude">
+			<Image name="dns" condition="is">C:\Windows\System32\dns.exe</Image>
+			<Image name="dns" condition="end with">.exe</Image>
+			<ProcessId condition="is">3196</ProcessId>
+			<Protocol condition="contains">tcp</Protocol>
+			<DestinationPort condition="is">389</DestinationPort>
+			<DestinationPortName condition="is">ldap</DestinationPortName>
+			<SourcePort condition="is">64111</SourcePort>
+			<!--dns.exe network connection detected-->
+		</NetworkConnect>
+
+		<!-- ProcessCreate name="Microsoft.ActiveDirectory.WebServices.exe" -->
+
+		<NetworkConnect onmatch="include">
+			<Image name="ADWS" condition="is">C:\Windows\ADWS\Microsoft.ActiveDirectory.WebServices.exe</Image>
+			<Image name="ADWS" condition="end with">.exe</Image>
+			<ProcessId condition="is">5116</ProcessId>
+			<Protocol condition="contains">tcp</Protocol>
+			<DestinationPort condition="is">389</DestinationPort>
+			<DestinationPortName condition="is">ldap</DestinationPortName>
+			<SourcePort condition="is">64110</SourcePort>
+			<!--Microsoft.ActiveDirectory.WebServices.exe network connection detected-->
+		</NetworkConnect>
+
+		<!-- ProcessCreate name="NT AUTHORITY\SYSTEM" -->
+
+		<NetworkConnect onmatch="include">
+			<User condition="is">NT AUTHORITY\SYSTEM</User>
+			<Image name="NT_AUTHORITY" condition="is">C:\Windows\System32\services.exe</Image>
+			<ProcessId condition="is">648</ProcessId>
+			<Protocol condition="contains">tcp</Protocol>
+			<DestinationPort condition="is">49695</DestinationPort>
+			<DestinationIp condition="is">192.168.1.7</DestinationIp>
+			<SourcePort condition="is">60489</SourcePort>
+			<SourceIp condition="is">192.168.1.8</SourceIp>
+			<!--NT AUTHORITY\SYSTEM network connection detected-->
+		</NetworkConnect>
+
+		<!-- ProcessCreate name="NT AUTHORITY\SYSTEM" -->
+
+		<NetworkConnect onmatch="include">
+			<Image name="NT AUTHORITY\SYSTEM" condition="is">C:\Windows\System32\dfsrs.exe</Image>
+			<Image name="NT AUTHORITY\SYSTEM" condition="is">C:\Windows\System32\services.exe</Image>
+			<Image name="Network Connection,suspicious_net_event=True" condition="is">sc.exe</Image> <!-- Alert=SC.exe Network Connection,suspicious_net_event=True -->
+			<Image name="" condition="is"></Image>
+		</NetworkConnect>
+	</RuleGroup>
+
+	<!--SYSMON EVENT ID 4 : RESERVED FOR SYSMON STATUS MESSAGES-->
+		<!--DATA: UtcTime, State, Version, SchemaVersion-->
+		<!--Cannot be filtered.-->		
+
+	<!--SYSMON EVENT ID 5 : PROCESS ENDED [ProcessTerminate]-->
+		<!--DATA: Rulename, UtcTime, ProcessGuid, ProcessId, Image-->
+
+	<!-- The RuleGroup that follows is related to the "Sysmon_Event_5(ProcessTerminate)" and outlines the most relevant to the Lateral Movement attacks ProcessTerminate rules of possible exploitation tools. -->
+
+	<RuleGroup name="Sysmon_Event_5(ProcessTerminate)" groupRelation="or">
+		<ProcessTerminate onmatch="include">
+			<Image name="Mimikatz Execution" condition="is">C:\Windows\System32\cmd.exe</Image> <!-- Reveals the end of the use of the windows command line (cmd) tool. -->
+			<Image name="Mimikatz Execution" condition="is">C:\Users\Administrator\Desktop\mimikatz_trunk\x64\mimikatz.exe</Image> <!-- Mimikatz is an open-source application that allows users to view and save authentication credentials like Kerberos tickets. -->
+			<Image name="LaZagne Project Execution" condition="is">C:\Users\Administrator\Downloads\lazagne.exe</Image> <!-- The LaZagne project is an open source application used to retrieve lots of passwords stored on a local computer.  -->
+			<Image name="PSexec Execution" condition="is">psexec.exe</Image> <!-- PsExec - execute processes remotely -->	
+			<Image name="PSKill Execution" condition="is">pskill.exe</Image> <!-- PsKill is a kill utility that not only does what the Resource Kit's version does, but can also kill processes on remote systems. -->
+			<Image name="dllhost Execution" condition="is">dllhost.exe</Image> <!-- COM Surrogate Microsoft Windows Operating System -->
+			<Image name="svchost Execution" condition="is">svchost.exe</Image> <!-- Svchost.exe (Service Host, or SvcHost) is a system process that can host from one or more Windows services in the Windows NT family of operating systems. -->
+			<Image name="ipconfig Execution" condition="is">ipconfig.exe</Image> <!-- Reveals initial target reconnaissance. -->
+			<Image name="PING Execution" condition="is">PING.exe</Image> <!-- Reveals initial target reconnaissance. -->
+			<Image name="wmiprvse Lateral Movement Hacking Alert" condition="is">wmiprvse.exe</Image>
+			<!--PSexec and Mimikatz Windows Command Processor ProcessTerminate-->
+			<Image name="C:\Users" condition="begin with">C:\Users</Image> <!--Process terminations by user binaries-->
+			<Image name="C:\ProgramData" condition="begin with">C:\ProgramData</Image> <!--Process terminations by user binaries-->
+			<Image name="\Temp\" condition="contains">\Temp\</Image> <!--Process terminations in temp directories-->
+			<Image name="Sysmon Execution" condition="end with">Sysmon.exe</Image> <!--Detect killing Sysmon, Credit: @vector_sec-->
+			<Image name="Sysmon64 Execution" condition="end with">Sysmon64.exe</Image> <!--Detect killing Sysmon, Credit: @vector_sec-->
+			<Image name="notepad Execution" condition="end with">C:\Windows\System32\notepad.exe</Image>
+			<Image name="klist Execution" condition="end with">klist.exe</Image> <!-- The ProcessCreate rule with Description "Tool for managing the Kerberos ticket cache" was included as one of the most obvious proofs of the execution of Kerberos tickets related Lateral Movement attacks, such as Pass the Hash, Pass the Ticket, Golden Ticket, Silver Ticket. -->
+			<Image name="sc Execution" condition="end with">sc.exe</Image> <!-- Service Control Manager-->
+		</ProcessTerminate>
+	</RuleGroup>
+	</EventFiltering>
+</Sysmon>
