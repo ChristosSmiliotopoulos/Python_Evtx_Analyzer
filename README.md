@@ -2,14 +2,14 @@
 
 This is .v1 of my newly created python analyzer, named Python_Evtx_Analyzer(PeX - v1) for .evtx files. With this
 portable and versatile chunk of code, the entries of Windows Event Logger and Sysmon .evtx files could be
-enumerated to reveal the existence or not of possible Lateral Movement Attacks over Small Office Home Office (SOHO)
-Networks. Along with .v1 of our python script, the analyzer is going to be initialized under the hood to identify the
-possibility of malicious Lateral Movement Attacks. All the associated filters are based on previous work done on
-the Sysmon config.xml file custom rules. What is special with this beta version of the python .evtx files analyzer is
-its independence from operating system platforms, namely Windows, macOS and any distribution of Linux OS. This
-would be analyzed thoroughly to the relevant README file which will accompany the distributed .py script on GitHub.
+enumerated through dedicated filtering, to reveal the existence or not of possible Lateral Movement Attacks over Small 
+Office Home Office (SOHO) Networks. Along with .v1 of our python script, the analyzer is going to be initialized under 
+the hood to identify the possibility of malicious Lateral Movement Attacks. All the associated filters are based on 
+previous work done on the Sysmon config.xml file custom rules. What is special with this beta version of the python .evtx 
+files analyzer is its independence from operating system platforms, namely Windows, macOS and any distribution of Linux OS. 
+This would be analyzed thoroughly to the relevant README file which will accompany the distributed .py script on GitHub.
 
-The source code and supporting material of Python_Evtx_Analyzer(PeX - v1) is available on
+The source code and supporting material of Python_Evtx_Analyzer(PeX - v1) is available on 
 https://github.com/ChristosSmiliotopoulos/Python_Evtx_Analyzer.git.
 
 # Setup 
