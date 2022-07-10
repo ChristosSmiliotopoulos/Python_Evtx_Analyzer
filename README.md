@@ -5,7 +5,7 @@ The enclosed in this Github repository script, is a python analyzing scripting t
 PeX’s events identification is based on Lateral Movement-oriented features that were extracted from Sysmon’s pre-configured rules in the enclosed config.xml file, as presented in the published pre-printed paper entitled "Revisiting the detection of Lateral Movement through Sysmon". What makes PeX special is its ability to be fully customizable by Incident Response researching teams to analyse and identify any kind of logging activity captured by Sysmon, either normal or malicious. As a result, PeX can be used in the context of other researchers in this timely field as it is made publicly available as open source in Github.
  
 
-Along with PeX's (v1), the analyzer is initialized under the hood to identify the possibility of malicious Lateral Movement Attacks. All the associated filters are based on the Sysmon's EDR proposed policy in the aformentioned "Revisiting the detection of Lateral Movement through Sysmon" paper. 
+Along with PeX's (v1), the analyzer is initialized under the hood to identify the possibility of malicious Lateral Movement Attacks. All the associated filters are based on the Sysmon's EDR proposed policy in the aformentioned "Revisiting the detection of Lateral Movement through Sysmon" paper. The proposed EDR rule-based Sysmon's policy is also enclosed with PeX's repository as "config.xml" file. 
 
 From an OS version’s perspective, the analyzer can run on all mainstream platforms, including Windows 10, MacOS Big Sur v11.6.5 and Ubuntu v22.04.
 
