@@ -1,4 +1,4 @@
-# This is a python analyzing scripting tool dubbed “Python_Evtx_Analyzer” (PeX - v1), which caters for the analysis of 
+# This is a python analyzing scripting tool dubbed "Python_Evtx_Analyzer" (PeX - v1), which caters for the analysis of 
 # voluminous Sysmon logs, and therefore contributes to the identification of Lateral Movement events in a timely manner. 
 # With this portable and versatile chunk of code, the entries of Windows Event Logger and Sysmon .evtx files could be 
 # enumerated through dedicated filtering, to reveal the existence or not of possible Lateral Movement Attacks over Small 
@@ -24,7 +24,7 @@
 import mmap  # Python's memory-mapped file input and output (I/O) library.
 
 import argparse  # argparse library is a parser for extra command-line options, arguments and sub-commands. This will
-# make our python_Evtx_Parser(v1 - Beta) capable to be executed on any Windows cmd or powershell, macOS/Linux
+# make our "Python_Evtx_Analyzer (PeX - v1)" capable to be executed on any Windows cmd or powershell, macOS/Linux
 # terminal environment.
 
 from xml.dom import minidom  # Python's compact implementation of the DOM interface enables programmers to parse XML
@@ -35,40 +35,38 @@ from evtx.Evtx import FileHeader  # Python library for parsing Windows Event Log
 
 import evtx.Views  # Evtx library's sub-library which renders the given record into an XML document.
 
-from xml.etree import ElementTree as xee  # ElementTree library allows a developer to parse and navigate an .xml,
-
-
+from xml.etree import ElementTree as xee  # ElementTree library allows a developer to parse and navigate an .xml, 
 # providing clever tree-based structure and giving him great insight to work with.
 
 # ======================================================================================================================
-# main() python function named python_Evtx_Parser(). This is the main block of code for the parser which only runs
+# main() python function named Python_Evtx_Analyzer(). This is the main block of code for the analyzer which only runs
 # when called with PyCharm of any known console, terminal, cmd or powershell. All the necessary parameters will be
-# passed to python_Evtx_Parser() as arguments.
+# passed to Python_Evtx_Analyzer() as arguments.
 # ======================================================================================================================
 
-def python_Evtx_Parser():
-    # argparse allows arguments to be passed together with the python_Evtx_Parser(v1 - Beta) execution either via
+def Python_Evtx_Analyzer():
+    # argparse allows arguments to be passed together with the "Python_Evtx_Analyzer (PeX - v1)" execution either via
     # cmd, terminal, powershell or via PyCharm or any other python IDE.
-    evtxParser = argparse.ArgumentParser(prog="python_Evtx_Parser", description="Enumeration of .evtx log files based "
+    evtxAnalyzer = argparse.ArgumentParser(prog="Python_Evtx_Analyzer", description="Enumeration of .evtx log files based "
                                                                                 "on EventID with Lateral Movement "
                                                                                 "Attacks oriented filtering.")
     # Input folder -f has been set in advance to "Run --> Edit Configurations" of PyCharm, but can also be set on the
-    # fly during the parser's execution via command line.
-    evtxParser.add_argument("-f", "--iFolder", dest="ifolder", type=str, required=True, help="System's location of the "
+    # fly during the analyzer's execution via command line.
+    evtxAnalyzer.add_argument("-f", "--iFolder", dest="ifolder", type=str, required=True, help="System's location of the "
                                                                                              ".evtx input folder.")
     # -i argument allows the user to define the number of a specific id to be parsed.
-    evtxParser.add_argument("-i", "--evtxId", dest="id", type=str, default="all",
+    evtxAnalyzer.add_argument("-i", "--evtxId", dest="id", type=str, default="all",
                             help="The ID of the enumerated Events.")
     # If --outputFolder is set to True, then all the enumerated information will be saved to the folder path that
     # comes with the argument. If set to False, then the parsed content or strings will be forward to the standard
     # output (the terminal screen).
-    evtxParser.add_argument("-o", "--outputFolder", dest="outputfolder", type=str, required=False, help="System's "
+    evtxAnalyzer.add_argument("-o", "--outputFolder", dest="outputfolder", type=str, required=False, help="System's "
                                                                                                         "location for"
                                                                                                         " the output "
                                                                                                         "folder where "
                                                                                                         "the results "
                                                                                                         "are printed.")
-    arguments = evtxParser.parse_args()  # The arguments are parsed to the specified variable.
+    arguments = evtxAnalyzer.parse_args()  # The arguments are parsed to the specified variable.
     outputFolder = False  # outputFolder is set to False.
     # If outputfolder is not None, it means that we have specified some outputs file.
     if arguments.outputfolder is not None:
@@ -249,6 +247,6 @@ def python_Evtx_Parser():
             print(endingTag)
 
 
-# The basic argument that makes our python_Evtx_Parser() main executable.
+# The basic argument that makes our Python_Evtx_Analyzer() main executable.
 if __name__ == '__main__':
-    python_Evtx_Parser()
+    Python_Evtx_Analyzer()
