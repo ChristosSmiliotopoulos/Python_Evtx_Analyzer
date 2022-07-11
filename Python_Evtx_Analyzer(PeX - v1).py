@@ -12,7 +12,7 @@
 # The source code, along with the following: 
 # 	- PeX's supporting material, 
 # 	- Sysmon's "config.xml" file, 
-# 	- Evtx Datasets, 
+# 	- Evtx Datasets ("Normal", "NormalVsMalicious01", "NormalVsMalicious02", "Fullset") in one .rar file, 
 # 	- Evtx Demo - Terminal Executions folders and 
 # 	- PeX's Readme.md file, 
 # can be downloaded from the tool's Github link, https://github.com/ChristosSmiliotopoulos/Python_Evtx_Analyzer.git.
@@ -54,7 +54,7 @@ def Python_Evtx_Analyzer():
     # fly during the analyzer's execution via command line.
     evtxAnalyzer.add_argument("-f", "--iFolder", dest="ifolder", type=str, required=True, help="System's location of the "
                                                                                              ".evtx input folder.")
-    # -i argument allows the user to define the number of a specific id to be parsed.
+    # -i argument allows the user to define the number of a specific id to be parsed and analyzed.
     evtxAnalyzer.add_argument("-i", "--evtxId", dest="id", type=str, default="all",
                             help="The ID of the enumerated Events.")
     # If --outputFolder is set to True, then all the enumerated information will be saved to the folder path that
