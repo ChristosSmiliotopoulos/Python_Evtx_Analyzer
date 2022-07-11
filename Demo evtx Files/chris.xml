@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='utf-8' standalone='yes' ?><EventIDs><?xml version="1.0" ?>
+<Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+	<System>
+		<Provider Name="Microsoft-Windows-Sysmon" Guid="{5770385f-c22a-43e0-bf4c-06f5698ffbd9}"/>
+		<EventID Qualifiers="">3</EventID>
+		<Version>5</Version>
+		<Level>4</Level>
+		<Task>3</Task>
+		<Opcode>0</Opcode>
+		<Keywords>0x8000000000000000</Keywords>
+		<TimeCreated SystemTime="2021-11-30 03:21:30.713898"/>
+		<EventRecordID>14743</EventRecordID>
+		<Correlation ActivityID="" RelatedActivityID=""/>
+		<Execution ProcessID="3064" ThreadID="3736"/>
+		<Channel>Microsoft-Windows-Sysmon/Operational</Channel>
+		<Computer>WIN-J23NIGGP1Q6.sysmon_set.local</Computer>
+		<Security UserID="S-1-5-18"/>
+	</System>
+	<EventData>
+		<Data Name="RuleName">-</Data>
+		<Data Name="UtcTime">2021-11-30 03:21:30.940</Data>
+		<Data Name="ProcessGuid">{27532e6a-847b-61a5-6a00-000000001500}</Data>
+		<Data Name="ProcessId">5116</Data>
+		<Data Name="Image">C:\Windows\ADWS\Microsoft.ActiveDirectory.WebServices.exe</Data>
+		<Data Name="User">NT AUTHORITY\SYSTEM</Data>
+		<Data Name="Protocol">tcp</Data>
+		<Data Name="Initiated">True</Data>
+		<Data Name="SourceIsIpv6">True</Data>
+		<Data Name="SourceIp">0:0:0:0:0:0:0:1</Data>
+		<Data Name="SourceHostname">WIN-J23NIGGP1Q6.sysmon_set.local</Data>
+		<Data Name="SourcePort">64166</Data>
+		<Data Name="SourcePortName">-</Data>
+		<Data Name="DestinationIsIpv6">True</Data>
+		<Data Name="DestinationIp">0:0:0:0:0:0:0:1</Data>
+		<Data Name="DestinationHostname">WIN-J23NIGGP1Q6.sysmon_set.local</Data>
+		<Data Name="DestinationPort">389</Data>
+		<Data Name="DestinationPortName">ldap</Data>
+	</EventData>
+</Event>

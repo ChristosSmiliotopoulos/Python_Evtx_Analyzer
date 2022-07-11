@@ -21,21 +21,22 @@
 # Importing necessary python libraries
 # ======================================================================================================================
 
+import imp
 import mmap  # Python's memory-mapped file input and output (I/O) library.
 
 import argparse  # argparse library is a parser for extra command-line options, arguments and sub-commands. This will
-# make our "Python_Evtx_Analyzer (PeX - v1)" capable to be executed on any Windows cmd or powershell, macOS/Linux
-# terminal environment.
+# make "Python_Evtx_Analyzer (PeX - v1)" capable to incorporate argurment function capabilities on any Windows cmd or 
+# powershell, macOS/Linux terminal environment.
 
 from xml.dom import minidom  # Python's compact implementation of the DOM interface enables programmers to parse XML
 # files via xml.dom.minidom xml parser.
 
 from evtx.Evtx import FileHeader  # Python library for parsing Windows Event Log files (.evtx). Fileheader() function
-# allows .evtx parsing based on the log file headers.
+# allows .evtx parsing based on the .evtx log file headers.
 
 import evtx.Views  # Evtx library's sub-library which renders the given record into an XML document.
 
-from xml.etree import ElementTree as xee  # ElementTree library allows a developer to parse and navigate an .xml, 
+from xml.etree import ElementTree as xee  # ElementTree library allows a developer to parse, navigate and filter an .xml, 
 # providing clever tree-based structure and giving him great insight to work with.
 
 # ======================================================================================================================
@@ -92,7 +93,7 @@ def Python_Evtx_Analyzer():
         # ==============================================================================================================
 
         # The for function that follows iterates over each record. For that reason the evtx_file_xml_view() is called
-        # from the Evtx.Views library. This function takes the fileheader object that was created with the
+        # from the Evtx.Views library. This function takes the .xml fileheader object that was created with the
         # FileHeader() function of Evtx.Evtx library and creates a tuple of two different objects. xmlToStr object is
         # a string representation of a xml entry object and the second is a record object that for the purposes of our
         # project will not be used, but it is necessary for the function to run.
