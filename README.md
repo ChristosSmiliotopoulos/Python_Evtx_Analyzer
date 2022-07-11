@@ -11,7 +11,19 @@ From an OS version’s perspective, the analyzer can run on all mainstream platf
 
 As a proof of concept, Pex was implemented with Python 3 on a VM Linux machine with 16 GB of RAM and a quad-core processor and evaluated over a 10-days dataset, regarding the analyzer’s detection and alerting rates. For reasons of reproducibility, but also for advancing research efforts in this area, the resulting dataset is publicly enclosed within the tool's repository. The .evtx dataset is aparted from four separate subsets, namely Normal, NormalVsMalicious01, NormalVsMalicious02 and FullSet, all enclosed in a .rar compressed file. 
 
-The source code, along with PeX's supporting material of "config.xml" file, Evtx Datasets and Evtx Demo - Terminal Executions folders and the tools Readme file, are all available on https://github.com/ChristosSmiliotopoulos/Python_Evtx_Analyzer.git.
+The source code, along with the following: 
+
+		- PeX's supporting material, 
+		
+		- Sysmon's "config.xml" file, 
+		
+		- Evtx Datasets, 
+		
+		- Evtx Demo - Terminal Executions folders and 
+		
+		- PeX's Readme.md file, 
+
+can be downloaded from the tool's Github link, https://github.com/ChristosSmiliotopoulos/Python_Evtx_Analyzer.git.
 
 # Setup 
 

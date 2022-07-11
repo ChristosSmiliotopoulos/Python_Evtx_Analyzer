@@ -1,14 +1,21 @@
-# This is .v1 of my newly created python parser, named python_Evtx_Parser(v1 - Beta) for .evtx files. With this
-# portable and versatile chunk of code, the entries of Windows Event Logger and Sysmon .evtx files could be
-# enumerated to reveal the existence or not of possible Lateral Movement Attacks over Small Office Home Office (SOHO)
-# Networks. Along with .v1 of our python script, the parser is going to be initialized under the hood to identify the
-# possibility of malicious Lateral Movement Attacks. All the associated filters are based on previous work done on
-# the Sysmon config.xml file custom rules. What is special with this beta version of the python .evtx files parser is
-# its independence from operating system platforms, namely Windows, macOS and any distribution of Linux OS. This
-# would be analyzed thoroughly to the relevant README file which will accompany the distributed .py script on GitHub.
+# This is a python analyzing scripting tool dubbed “Python_Evtx_Analyzer” (PeX - v1), which caters for the analysis of 
+# voluminous Sysmon logs, and therefore contributes to the identification of Lateral Movement events in a timely manner. 
+# With this portable and versatile chunk of code, the entries of Windows Event Logger and Sysmon .evtx files could be 
+# enumerated through dedicated filtering, to reveal the existence or not of possible Lateral Movement Attacks over Small 
+# Office Home Office (SOHO) Networks. PeX’s events identification is based on Lateral Movement-oriented features that 
+# were extracted from Sysmon’s pre-configured rules in the enclosed config.xml file, as presented in the published 
+# pre-printed paper entitled "Revisiting the detection of Lateral Movement through Sysmon". What makes PeX special is it's 
+# ability to be fully customizable by Incident Response researching teams to analyse and identify any kind of logging '
+# activity captured by Sysmon, either normal or malicious. As a result, PeX can be used in the context of other researchers 
+# in this timely field as it is made publicly available as open source in Github.
 
-# The source code and supporting material of python_Evtx_Parser(v1 - Beta) is available on
-# https://github.com/ChristosSmiliotopoulos/pythonParser.git private repository.
+# The source code, along with the following: 
+# 	- PeX's supporting material, 
+# 	- Sysmon's "config.xml" file, 
+# 	- Evtx Datasets, 
+# 	- Evtx Demo - Terminal Executions folders and 
+# 	- PeX's Readme.md file, 
+# can be downloaded from the tool's Github link, https://github.com/ChristosSmiliotopoulos/Python_Evtx_Analyzer.git.
 
 # ======================================================================================================================
 # Importing necessary python libraries
