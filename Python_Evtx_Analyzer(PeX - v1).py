@@ -21,7 +21,9 @@
 # Importing necessary python libraries
 # ======================================================================================================================
 
+from cgi import print_arguments
 import imp
+from itertools import count
 import mmap  # Python's memory-mapped file input and output (I/O) library.
 
 import argparse  # argparse library is a parser for extra command-line options, arguments and sub-commands. This will
@@ -89,7 +91,7 @@ def Python_Evtx_Analyzer():
 
         # Counter variable will be used to count the suspicious for Lateral Movement attacks network traffic.
         Counter = 0
-
+        dict = []
         # ==============================================================================================================
 
         # The for function that follows iterates over each record. For that reason the evtx_file_xml_view() is called
@@ -114,7 +116,27 @@ def Python_Evtx_Analyzer():
                         outputFolder.write(xmlToDoc.toprettyxml())
                     else:
                         print(xmlToDoc.toprettyxml())
+                        dom_elements = xmlToDoc.getElementsByTagName("Data")
+                        node = dom_elements[4]
+                        text_node = node.firstChild
+                        text_value = text_node.nodeValue
+                        print(text_value)
 
+                        if text_value == "C:\Windows\System32\conhost.exe" or text_value == "C:\Windows\System32\cmd.exe":
+                            print("Element found!!!")
+                            Counter +=1
+                            print(Counter)
+                            # print(dict)
+
+                        # PFD = xmlToDoc.getElementsByTagName("EventData")
+                        # PNT = xmlToDoc.getElementsByTagName("Data")
+                        # for element in PNT:
+                        #     if element.getAttribute('Name') == "ProcessId":
+                                # Counter += 1
+                                # print("element found")
+                                # print(Counter)
+                                # print(element.getAttributeNode("Name"))
+                       
             # ==========================================================================================================
             # ==========================================================================================================
             # The statements that follow are responsible for filtering the parsed to xml .evtx files and print alert
@@ -124,114 +146,114 @@ def Python_Evtx_Analyzer():
             # ==========================================================================================================
             # ==========================================================================================================
 
-            # xmlToStr variable is passed as string to the doc variable.
-            doc = xee.fromstring(xmlToStr)
-            # The for loop() iterates over the tags of the xmlToStr .xml file, created with minidom, searching for the
-            # requested tag images, as follows.
-            for tag in doc.findall('Name'):
-                if tag.attrib['Image'] == 'lsass' or tag.attrib['Image'] == 'klist' \
-                        or tag.attrib['Image'] == 'conhost' or tag.attrib['Image'] == 'cmd' \
-                        or tag.attrib['Image'] == 'PING' or tag.attrib['Image'] == '.exe' \
-                        or tag.attrib['Image'] == 'dllhost' or tag.attrib['Image'] == 'svchost' \
-                        or tag.attrib['Image'] == 'ipconfig' or tag.attrib['Image'] == 'mimikatz'\
-                        or tag.attrib['Image'] == 'psexec' or tag.attrib['Image'] == 'psexesvc'\
-                        or tag.attrib['Image'] == 'pskill' or tag.attrib['Image'] == 'wmiprvse'\
-                        or tag.attrib['Image'] == 'sppsvc' or tag.attrib['Image'] == 'reg'\
-                        or tag.attrib['Image'] == 'wininit' or tag.attrib['Image'] == 'whoami'\
-                        or tag.attrib['Image'] == 'lazagne' or tag.attrib['CommandLine'] == 'sdelete'\
-                        or tag.attrib['CommandLine'] == 'sekurlsa' or tag.attrib['CommandLine'] == 'reg SAVE'\
-                        or tag.attrib['CommandLine'] == 'Invoke-DllInjection' or tag.attrib['CommandLine'] == 'Invoke-Shellcode'\
-                        or tag.attrib['CommandLine'] == 'Invoke-WmiCommand' or tag.attrib['CommandLine'] == 'Get-Keystrokes'\
-                        or tag.attrib['CommandLine'] == 'Get-TimedScreenshot' or tag.attrib['CommandLine'] == 'Get-VaultCredential'\
-                        or tag.attrib['CommandLine'] == 'Invoke-CredentialInjection' or tag.attrib['CommandLine'] == 'mimikatz'\
-                        or tag.attrib['CommandLine'] == 'Add-ScrnSaveBackdoor' or tag.attrib['CommandLine'] == 'Enabled-DuplicateToken'\
-                        or tag.attrib['CommandLine'] == 'Invoke-PsUaCme' or tag.attrib['CommandLine'] == 'Remove-Update'\
-                        or tag.attrib['CommandLine'] == 'Check-VM' or tag.attrib['CommandLine'] == 'Get-SiteListPassword'\
-                        or tag.attrib['CommandLine'] == 'Get-System' or tag.attrib['CommandLine'] == 'BypassUAC'\
-                        or tag.attrib['CommandLine'] == 'Invoke-Tater' or tag.attrib['CommandLine'] == 'PowerUp'\
-                        or tag.attrib['CommandLine'] == 'Get-LSASecret' or tag.attrib['CommandLine'] == 'psscan'\
-                        or tag.attrib['CommandLine'] == 'Invoke-PowerShellWMI' or tag.attrib['CommandLine'] == 'Add-Exfiltration'\
-                        or tag.attrib['CommandLine'] == 'Add-Persistence' or tag.attrib['CommandLine'] == 'wmic shadowcopy delete'\
-                        or tag.attrib['CommandLine'] == 'wbadmin delete catalog' or tag.attrib['CommandLine'] == 'set {default} recoveryenabled no'\
-                        or tag.attrib['CommandLine'] == 'telnet' or tag.attrib['CommandLine'] == '-dumpcr'\
-                        or tag.attrib['CommandLine'] == 'putty' or tag.attrib['CommandLine'] == 'bash'\
-                        or tag.attrib['CommandLine'] == 'pssh' or tag.attrib['CommandLine'] == 'Invoke-TokenManipulation'\
-                        or tag.attrib['CommandLine'] == 'Out-Minidump' or tag.attrib['CommandLine'] == 'VolumeShadowCopyTools'\
-                        or tag.attrib['CommandLine'] == 'Invoke-ReflectivePEInjection' or tag.attrib['CommandLine'] == 'Invoke-DowngradeAccount'\
-                        or tag.attrib['CommandLine'] == 'Get-ServiceUnquoted' or tag.attrib['CommandLine'] == 'Get-VulnSchTask'\
-                        or tag.attrib['CommandLine'] == 'Get-WebConfig' or tag.attrib['CommandLine'] == 'Get-ServiceFilePermission'\
-                        or tag.attrib['CommandLine'] == 'Get-ServicePermission' or tag.attrib['CommandLine'] == 'Invoke-ServiceAbuse'\
-                        or tag.attrib['CommandLine'] == 'Get-RegAutoLogon' or tag.attrib['CommandLine'] == 'Get-Unconstrained'\
-                        or tag.attrib['CommandLine'] == 'Add-RegBackdoor' or tag.attrib['CommandLine'] == 'Get-PassHashes'\
-                        or tag.attrib['CommandLine'] == 'Show-TargetScreen' or tag.attrib['CommandLine'] == 'Port-Scan'\
-                        or tag.attrib['CommandLine'] == 'netscan' or tag.attrib['Image'] == 'dfsrs'\
-                        or tag.attrib['Image'] == 'dns' or tag.attrib['Image'] == 'WebServices'\
-                        or tag.attrib['Image'] == 'services' or tag.attrib['Image'] == 'Users'\
-                        or tag.attrib['Image'] == 'ProgramData' or tag.attrib['Image'] == 'Temp'\
-                        or tag.attrib['Image'] == 'Sysmon' or tag.attrib['Image'] == 'Sysmon64'\
-                        or tag.attrib['Image'] == 'notepad' or tag.attrib['Image'] == 'sc':
-                    doc.remove(tag)
-            print(xee.tostring(doc))
-            countVar = xmlToStr.count("lsass") + xmlToStr.count("klist") +\
-                       + xmlToStr.count("conhost") + xmlToStr.count("cmd") \
-                       + xmlToStr.count("PING") + xmlToStr.count(".exe") \
-                       + xmlToStr.count("dllhost") + xmlToStr.count("svchost") \
-                       + xmlToStr.count("ipconfig") + xmlToStr.count("mimikatz") \
-                       + xmlToStr.count("psexec") + xmlToStr.count("psexesvc") \
-                       + xmlToStr.count("pskill") + xmlToStr.count("wmiprvse") \
-                       + xmlToStr.count("sppsvc") + xmlToStr.count("reg")\
-                       + xmlToStr.count("wininit") + xmlToStr.count("whoami")\
-                       + xmlToStr.count("lazagne") + xmlToStr.count("sdelete")\
-                       + xmlToStr.count("sekurlsa") + xmlToStr.count("reg SAVE")\
-                       + xmlToStr.count("Invoke-DllInjection") + xmlToStr.count("Invoke-Shellcode")\
-                       + xmlToStr.count("Invoke-WmiCommand") + xmlToStr.count("Get-Keystrokes")\
-                       + xmlToStr.count("Get-TimedScreenshot") + xmlToStr.count("Get-VaultCredential")\
-                       + xmlToStr.count("Invoke-CredentialInjection") + xmlToStr.count("mimikatz")\
-                       + xmlToStr.count("Add-ScrnSaveBackdoor") + xmlToStr.count("Enabled-DuplicateToken")\
-                       + xmlToStr.count("Invoke-PsUaCme") + xmlToStr.count("Remove-Update")\
-                       + xmlToStr.count("Check-VM") + xmlToStr.count("Get-SiteListPassword")\
-                       + xmlToStr.count("Get-System") + xmlToStr.count("BypassUAC")\
-                       + xmlToStr.count("Invoke-Tater") + xmlToStr.count("PowerUp")\
-                       + xmlToStr.count("Get-LSASecret") + xmlToStr.count("psscan")\
-                       + xmlToStr.count("Invoke-PowerShellWMI") + xmlToStr.count("Add-Exfiltration")\
-                       + xmlToStr.count("Add-Persistence") + xmlToStr.count("wmic shadowcopy delete")\
-                       + xmlToStr.count("wbadmin delete catalog") + xmlToStr.count("set {default} recoveryenabled no")\
-                       + xmlToStr.count("telnet") + xmlToStr.count("-dumpcr")\
-                       + xmlToStr.count("putty") + xmlToStr.count("bash")\
-                       + xmlToStr.count("pssh") + xmlToStr.count("Invoke-TokenManipulation")\
-                       + xmlToStr.count("Out-Minidump") + xmlToStr.count("VolumeShadowCopyTools")\
-                       + xmlToStr.count("Invoke-ReflectivePEInjection") + xmlToStr.count("Invoke-DowngradeAccount")\
-                       + xmlToStr.count("Get-ServiceUnquoted") + xmlToStr.count("Get-VulnSchTask")\
-                       + xmlToStr.count("Get-WebConfig") + xmlToStr.count("Get-ServiceFilePermission")\
-                       + xmlToStr.count("Get-ServicePermission") + xmlToStr.count("Invoke-ServiceAbuse")\
-                       + xmlToStr.count("Get-RegAutoLogon") + xmlToStr.count("Get-Unconstrained")\
-                       + xmlToStr.count("Add-RegBackdoor") + xmlToStr.count("Get-PassHashes")\
-                       + xmlToStr.count("Show-TargetScreen") + xmlToStr.count("Port-Scan")\
-                       + xmlToStr.count("netscan") + xmlToStr.count("dfsrs")\
-                       + xmlToStr.count("dns") + xmlToStr.count("WebServices")\
-                       + xmlToStr.count("services") + xmlToStr.count("Users")\
-                       + xmlToStr.count("ProgramData") + xmlToStr.count("Temp")\
-                       + xmlToStr.count("Sysmon") + xmlToStr.count("Sysmon64")\
-                       + xmlToStr.count("notepad") + xmlToStr.count("sc")
-            print(countVar)
+        #     # xmlToStr variable is passed as string to the doc variable.
+        #     doc = xee.fromstring(xmlToStr)
+        #     # The for loop() iterates over the tags of the xmlToStr .xml file, created with minidom, searching for the
+        #     # requested tag images, as follows.
+        #     for tag in doc.findall('Name'):
+        #         if tag.attrib['Image'] == 'lsass' or tag.attrib['Image'] == 'klist' \
+        #                 or tag.attrib['Image'] == 'conhost' or tag.attrib['Image'] == 'cmd' \
+        #                 or tag.attrib['Image'] == 'PING' or tag.attrib['Image'] == '.exe' \
+        #                 or tag.attrib['Image'] == 'dllhost' or tag.attrib['Image'] == 'svchost' \
+        #                 or tag.attrib['Image'] == 'ipconfig' or tag.attrib['Image'] == 'mimikatz'\
+        #                 or tag.attrib['Image'] == 'psexec' or tag.attrib['Image'] == 'psexesvc'\
+        #                 or tag.attrib['Image'] == 'pskill' or tag.attrib['Image'] == 'wmiprvse'\
+        #                 or tag.attrib['Image'] == 'sppsvc' or tag.attrib['Image'] == 'reg'\
+        #                 or tag.attrib['Image'] == 'wininit' or tag.attrib['Image'] == 'whoami'\
+        #                 or tag.attrib['Image'] == 'lazagne' or tag.attrib['CommandLine'] == 'sdelete'\
+        #                 or tag.attrib['CommandLine'] == 'sekurlsa' or tag.attrib['CommandLine'] == 'reg SAVE'\
+        #                 or tag.attrib['CommandLine'] == 'Invoke-DllInjection' or tag.attrib['CommandLine'] == 'Invoke-Shellcode'\
+        #                 or tag.attrib['CommandLine'] == 'Invoke-WmiCommand' or tag.attrib['CommandLine'] == 'Get-Keystrokes'\
+        #                 or tag.attrib['CommandLine'] == 'Get-TimedScreenshot' or tag.attrib['CommandLine'] == 'Get-VaultCredential'\
+        #                 or tag.attrib['CommandLine'] == 'Invoke-CredentialInjection' or tag.attrib['CommandLine'] == 'mimikatz'\
+        #                 or tag.attrib['CommandLine'] == 'Add-ScrnSaveBackdoor' or tag.attrib['CommandLine'] == 'Enabled-DuplicateToken'\
+        #                 or tag.attrib['CommandLine'] == 'Invoke-PsUaCme' or tag.attrib['CommandLine'] == 'Remove-Update'\
+        #                 or tag.attrib['CommandLine'] == 'Check-VM' or tag.attrib['CommandLine'] == 'Get-SiteListPassword'\
+        #                 or tag.attrib['CommandLine'] == 'Get-System' or tag.attrib['CommandLine'] == 'BypassUAC'\
+        #                 or tag.attrib['CommandLine'] == 'Invoke-Tater' or tag.attrib['CommandLine'] == 'PowerUp'\
+        #                 or tag.attrib['CommandLine'] == 'Get-LSASecret' or tag.attrib['CommandLine'] == 'psscan'\
+        #                 or tag.attrib['CommandLine'] == 'Invoke-PowerShellWMI' or tag.attrib['CommandLine'] == 'Add-Exfiltration'\
+        #                 or tag.attrib['CommandLine'] == 'Add-Persistence' or tag.attrib['CommandLine'] == 'wmic shadowcopy delete'\
+        #                 or tag.attrib['CommandLine'] == 'wbadmin delete catalog' or tag.attrib['CommandLine'] == 'set {default} recoveryenabled no'\
+        #                 or tag.attrib['CommandLine'] == 'telnet' or tag.attrib['CommandLine'] == '-dumpcr'\
+        #                 or tag.attrib['CommandLine'] == 'putty' or tag.attrib['CommandLine'] == 'bash'\
+        #                 or tag.attrib['CommandLine'] == 'pssh' or tag.attrib['CommandLine'] == 'Invoke-TokenManipulation'\
+        #                 or tag.attrib['CommandLine'] == 'Out-Minidump' or tag.attrib['CommandLine'] == 'VolumeShadowCopyTools'\
+        #                 or tag.attrib['CommandLine'] == 'Invoke-ReflectivePEInjection' or tag.attrib['CommandLine'] == 'Invoke-DowngradeAccount'\
+        #                 or tag.attrib['CommandLine'] == 'Get-ServiceUnquoted' or tag.attrib['CommandLine'] == 'Get-VulnSchTask'\
+        #                 or tag.attrib['CommandLine'] == 'Get-WebConfig' or tag.attrib['CommandLine'] == 'Get-ServiceFilePermission'\
+        #                 or tag.attrib['CommandLine'] == 'Get-ServicePermission' or tag.attrib['CommandLine'] == 'Invoke-ServiceAbuse'\
+        #                 or tag.attrib['CommandLine'] == 'Get-RegAutoLogon' or tag.attrib['CommandLine'] == 'Get-Unconstrained'\
+        #                 or tag.attrib['CommandLine'] == 'Add-RegBackdoor' or tag.attrib['CommandLine'] == 'Get-PassHashes'\
+        #                 or tag.attrib['CommandLine'] == 'Show-TargetScreen' or tag.attrib['CommandLine'] == 'Port-Scan'\
+        #                 or tag.attrib['CommandLine'] == 'netscan' or tag.attrib['Image'] == 'dfsrs'\
+        #                 or tag.attrib['Image'] == 'dns' or tag.attrib['Image'] == 'WebServices'\
+        #                 or tag.attrib['Image'] == 'services' or tag.attrib['Image'] == 'Users'\
+        #                 or tag.attrib['Image'] == 'ProgramData' or tag.attrib['Image'] == 'Temp'\
+        #                 or tag.attrib['Image'] == 'Sysmon' or tag.attrib['Image'] == 'Sysmon64'\
+        #                 or tag.attrib['Image'] == 'notepad' or tag.attrib['Image'] == 'sc':
+        #             doc.remove(tag)
+        #     # print(xee.tostring(doc))
+        #     countVar = xmlToStr.count("lsass") + xmlToStr.count("klist") +\
+        #                + xmlToStr.count("conhost") + xmlToStr.count("cmd") \
+        #                + xmlToStr.count("PING") + xmlToStr.count(".exe") \
+        #                + xmlToStr.count("dllhost") + xmlToStr.count("svchost") \
+        #                + xmlToStr.count("ipconfig") + xmlToStr.count("mimikatz") \
+        #                + xmlToStr.count("psexec") + xmlToStr.count("psexesvc") \
+        #                + xmlToStr.count("pskill") + xmlToStr.count("wmiprvse") \
+        #                + xmlToStr.count("sppsvc") + xmlToStr.count("reg")\
+        #                + xmlToStr.count("wininit") + xmlToStr.count("whoami")\
+        #                + xmlToStr.count("lazagne") + xmlToStr.count("sdelete")\
+        #                + xmlToStr.count("sekurlsa") + xmlToStr.count("reg SAVE")\
+        #                + xmlToStr.count("Invoke-DllInjection") + xmlToStr.count("Invoke-Shellcode")\
+        #                + xmlToStr.count("Invoke-WmiCommand") + xmlToStr.count("Get-Keystrokes")\
+        #                + xmlToStr.count("Get-TimedScreenshot") + xmlToStr.count("Get-VaultCredential")\
+        #                + xmlToStr.count("Invoke-CredentialInjection") + xmlToStr.count("mimikatz")\
+        #                + xmlToStr.count("Add-ScrnSaveBackdoor") + xmlToStr.count("Enabled-DuplicateToken")\
+        #                + xmlToStr.count("Invoke-PsUaCme") + xmlToStr.count("Remove-Update")\
+        #                + xmlToStr.count("Check-VM") + xmlToStr.count("Get-SiteListPassword")\
+        #                + xmlToStr.count("Get-System") + xmlToStr.count("BypassUAC")\
+        #                + xmlToStr.count("Invoke-Tater") + xmlToStr.count("PowerUp")\
+        #                + xmlToStr.count("Get-LSASecret") + xmlToStr.count("psscan")\
+        #                + xmlToStr.count("Invoke-PowerShellWMI") + xmlToStr.count("Add-Exfiltration")\
+        #                + xmlToStr.count("Add-Persistence") + xmlToStr.count("wmic shadowcopy delete")\
+        #                + xmlToStr.count("wbadmin delete catalog") + xmlToStr.count("set {default} recoveryenabled no")\
+        #                + xmlToStr.count("telnet") + xmlToStr.count("-dumpcr")\
+        #                + xmlToStr.count("putty") + xmlToStr.count("bash")\
+        #                + xmlToStr.count("pssh") + xmlToStr.count("Invoke-TokenManipulation")\
+        #                + xmlToStr.count("Out-Minidump") + xmlToStr.count("VolumeShadowCopyTools")\
+        #                + xmlToStr.count("Invoke-ReflectivePEInjection") + xmlToStr.count("Invoke-DowngradeAccount")\
+        #                + xmlToStr.count("Get-ServiceUnquoted") + xmlToStr.count("Get-VulnSchTask")\
+        #                + xmlToStr.count("Get-WebConfig") + xmlToStr.count("Get-ServiceFilePermission")\
+        #                + xmlToStr.count("Get-ServicePermission") + xmlToStr.count("Invoke-ServiceAbuse")\
+        #                + xmlToStr.count("Get-RegAutoLogon") + xmlToStr.count("Get-Unconstrained")\
+        #                + xmlToStr.count("Add-RegBackdoor") + xmlToStr.count("Get-PassHashes")\
+        #                + xmlToStr.count("Show-TargetScreen") + xmlToStr.count("Port-Scan")\
+        #                + xmlToStr.count("netscan") + xmlToStr.count("dfsrs")\
+        #                + xmlToStr.count("dns") + xmlToStr.count("WebServices")\
+        #                + xmlToStr.count("services") + xmlToStr.count("Users")\
+        #                + xmlToStr.count("ProgramData") + xmlToStr.count("Temp")\
+        #                + xmlToStr.count("Sysmon") + xmlToStr.count("Sysmon64")\
+        #                + xmlToStr.count("notepad") + xmlToStr.count("sc")
+        #     print(countVar)
 
-            if countVar >= 1:
-                Counter += 1
-                print(Counter)
-                print("ATTENTION!!!", " ", Counter, " ",
-                      "Events have been identified on the targeted system as suspicious for Lateral Movement Attack!!!")
-            elif countVar == 0:
-                Counter = Counter
-                print(Counter)
-                print("ATTENTION!!!", "No suspicious events for Lateral Movement Attacks have been identified on the "
-                                      "targeted system!!!")
+        #     if countVar >= 1:
+        #         Counter += 1
+        #         print(Counter)
+        #         print("ATTENTION!!!", " ", Counter, " ",
+        #               "Events have been identified on the targeted system as suspicious for Lateral Movement Attack!!!")
+        #     elif countVar == 0:
+        #         Counter = Counter
+        #         print(Counter)
+        #         print("ATTENTION!!!", "No suspicious events for Lateral Movement Attacks have been identified on the "
+        #                               "targeted system!!!")
 
-        print("Final Report: Filtering for Lateral Movement Attacks was finished successfully with ", Counter,
-              " potentially malicious Events identified.")
-        print("########SOS SOS SOS Attention should be paid to the targeted system.########")
-        print("ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, "
-              "\n ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, "
-              "\n ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ")
+        # print("Final Report: Filtering for Lateral Movement Attacks was finished successfully with ", Counter,
+        #       " potentially malicious Events identified.")
+        # print("########SOS SOS SOS Attention should be paid to the targeted system.########")
+        # print("ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, "
+        #       "\n ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, "
+        #       "\n ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ALERT, ")
 
         # ==============================================================================================================
         # This is the END of the filtering process
