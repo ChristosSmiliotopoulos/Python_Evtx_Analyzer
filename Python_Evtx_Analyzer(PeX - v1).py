@@ -128,12 +128,18 @@ def Python_Evtx_Analyzer():
                         print(xmlToDoc.toprettyxml())
                         dom_elements = xmlToDoc.getElementsByTagName("Data")
                         node = dom_elements[4]
-                        text_node = node.firstChild
-                        text_value = text_node.nodeValue
-                        print(text_value)
+                        text_node1 = node.firstChild
+                        text_value1 = text_node1.nodeValue
+                        print(text_value1)
+
+                        # node = dom_elements[10]
+                        # text_node2 = node.firstChild
+                        # text_value2 = text_node2.nodeValue
+                        # print(text_value2)
 
                         for i in list_of_lists:
-                            if text_value == i:
+                            # if text_value1 == i or text_value2 == i:
+                            if text_value1 == i:
                                 print("Element found!!!")
                                 Counter +=1
                                 print(Counter)
