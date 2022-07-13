@@ -91,7 +91,17 @@ def Python_Evtx_Analyzer():
 
         # Counter variable will be used to count the suspicious for Lateral Movement attacks network traffic.
         Counter = 0
-        dict = []
+        myCount = int
+
+        a_file = open("filters.txt", "r")
+
+        lines = a_file.read()
+        list_of_lists = lines.splitlines()
+
+        a_file.close()
+
+        print(list_of_lists)
+
         # ==============================================================================================================
 
         # The for function that follows iterates over each record. For that reason the evtx_file_xml_view() is called
@@ -122,20 +132,13 @@ def Python_Evtx_Analyzer():
                         text_value = text_node.nodeValue
                         print(text_value)
 
-                        if text_value == "C:\Windows\System32\conhost.exe" or text_value == "C:\Windows\System32\cmd.exe":
-                            print("Element found!!!")
-                            Counter +=1
-                            print(Counter)
-                            # print(dict)
-
-                        # PFD = xmlToDoc.getElementsByTagName("EventData")
-                        # PNT = xmlToDoc.getElementsByTagName("Data")
-                        # for element in PNT:
-                        #     if element.getAttribute('Name') == "ProcessId":
-                                # Counter += 1
-                                # print("element found")
-                                # print(Counter)
-                                # print(element.getAttributeNode("Name"))
+                        for i in list_of_lists:
+                            if text_value == i:
+                                print("Element found!!!")
+                                Counter +=1
+                                print(Counter)
+                                myCount = Counter
+                        print(myCount, " Lateral Movement events have been found in total!!!")
                        
             # ==========================================================================================================
             # ==========================================================================================================
