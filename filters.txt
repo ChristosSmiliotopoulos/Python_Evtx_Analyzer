@@ -83,3 +83,6 @@ sc
 C:\Windows\System32\whoami.exe
 C:\Windows\System32\ipconfig.exe
 ipconfig
+C:\Windows\System32\sppsvc.exe
+C:\Windows\System32\lsass.exe
+WIN-J23NIGGP1Q6.sysmon_set.local

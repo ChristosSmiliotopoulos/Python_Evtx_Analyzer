@@ -38,7 +38,9 @@ from evtx.Evtx import FileHeader  # Python library for parsing Windows Event Log
 
 import evtx.Views  # Evtx library's sub-library which renders the given record into an XML document.
 
-from xml.etree import ElementTree as xee  # ElementTree library allows a developer to parse, navigate and filter an .xml, 
+from xml.etree import ElementTree as xee
+
+from pandas import value_counts  # ElementTree library allows a developer to parse, navigate and filter an .xml, 
 # providing clever tree-based structure and giving him great insight to work with.
 
 # ======================================================================================================================
@@ -90,8 +92,8 @@ def Python_Evtx_Analyzer():
             print(xmlHeaderOutput)
 
         # Counter variable will be used to count the suspicious for Lateral Movement attacks network traffic.
-        Counter = 0
-        myCount = int
+        # Counter = 0
+        # globvar = 0
 
         a_file = open("filters.txt", "r")
 
@@ -101,6 +103,34 @@ def Python_Evtx_Analyzer():
         a_file.close()
 
         print(list_of_lists)
+
+        globvar = 0
+        globvar1 = 0
+        globvar2 = 0
+
+        def textValueDom(int):
+            nonlocal globvar
+            globvar = 0
+            Counter = 0
+            myCount = int
+            dom_elements = xmlToDoc.getElementsByTagName("Data")
+            node1 = dom_elements[int]
+            text_node1 = node1.firstChild
+            text_value1 = text_node1.nodeValue
+            print(text_value1)
+            for i in list_of_lists:
+                # if text_value1 == i or text_value2 == i:
+                if text_value1 == i:
+                    print("Element found!!!")
+                    Counter +=1
+                    # print(Counter)
+                    myCount = Counter
+                    print(myCount, " Lateral Movement events have been found in total!!!")
+                    globvar +=1
+                    # print(globvar)
+
+        def print_globvar():
+            print(globvar)
 
         # ==============================================================================================================
 
@@ -125,26 +155,43 @@ def Python_Evtx_Analyzer():
                     if outputFolder:
                         outputFolder.write(xmlToDoc.toprettyxml())
                     else:
-                        print(xmlToDoc.toprettyxml())
-                        dom_elements = xmlToDoc.getElementsByTagName("Data")
-                        node = dom_elements[4]
-                        text_node1 = node.firstChild
-                        text_value1 = text_node1.nodeValue
-                        print(text_value1)
+                        if eventsByID == "1":
+                            print(xmlToDoc.toprettyxml())
+                            textValueDom(10)
+                            globvar1 = globvar
+                            print("globvar1 is ", globvar1)
+                            print(xmlToDoc.toprettyxml())
+                            textValueDom(4)
+                            globvar2 = globvar
+                            print("globvar1 is ", globvar2)
+                        # elif eventsByID == "1":
+                        #     print(xmlToDoc.toprettyxml())
+                        #     textValueDom(4)
+                        #     globvar2 = globvar
+                        #     print(globvar2)
+                            print("The total of globvars is ", globvar1 + globvar2)
+                            
 
-                        # node = dom_elements[10]
-                        # text_node2 = node.firstChild
+                        # print(xmlToDoc.toprettyxml())
+                        # dom_elements = xmlToDoc.getElementsByTagName("Data")
+                        # node1 = dom_elements[4]
+                        # text_node1 = node1.firstChild
+                        # text_value1 = text_node1.nodeValue
+                        # print(text_value1)
+
+                        # node2 = dom_elements[10]
+                        # text_node2 = node2.firstChild
                         # text_value2 = text_node2.nodeValue
                         # print(text_value2)
 
-                        for i in list_of_lists:
-                            # if text_value1 == i or text_value2 == i:
-                            if text_value1 == i:
-                                print("Element found!!!")
-                                Counter +=1
-                                print(Counter)
-                                myCount = Counter
-                        print(myCount, " Lateral Movement events have been found in total!!!")
+                        # for i in list_of_lists:
+                        #     # if text_value1 == i or text_value2 == i:
+                        #     if text_value1 == i:
+                        #         print("Element found!!!")
+                        #         Counter +=1
+                        #         print(Counter)
+                        #         myCount = Counter
+                        # print(myCount, " Lateral Movement events have been found in total!!!")
                        
             # ==========================================================================================================
             # ==========================================================================================================
