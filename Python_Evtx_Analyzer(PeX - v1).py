@@ -107,10 +107,15 @@ def Python_Evtx_Analyzer():
         globvar = 0
         globvar1 = 0
         globvar2 = 0
+        countTextValues = 0
+        countTextValues1 = 0
+        countTextValues2 = 0
 
         def textValueDom(int):
             nonlocal globvar
+            nonlocal countTextValues
             globvar = 0
+            countTextValues = 0
             Counter = 0
             myCount = int
             dom_elements = xmlToDoc.getElementsByTagName("Data")
@@ -118,6 +123,7 @@ def Python_Evtx_Analyzer():
             text_node1 = node1.firstChild
             text_value1 = text_node1.nodeValue
             print(text_value1)
+            countTextValues +=1
             for i in list_of_lists:
                 # if text_value1 == i or text_value2 == i:
                 if text_value1 == i:
@@ -131,6 +137,10 @@ def Python_Evtx_Analyzer():
 
         def print_globvar():
             print(globvar)
+
+        eventIDValues1 = ['1', '2', '3', '4', '6', '7', '8', '9', '10', '11']
+        eventIDValues2 = ['5']
+
 
         # ==============================================================================================================
 
@@ -155,23 +165,32 @@ def Python_Evtx_Analyzer():
                     if outputFolder:
                         outputFolder.write(xmlToDoc.toprettyxml())
                     else:
-                        if eventsByID == "1":
+                        # if eventsByID == "1" or eventsByID == "2" or eventsByID == "3":
+                        if eventsByID in eventIDValues1:
                             print(xmlToDoc.toprettyxml())
                             textValueDom(10)
-                            globvar1 = globvar
+                            print("The instances of globvar2 in the local tag are ", globvar)
+                            globvar1 = globvar1 + globvar
                             print("globvar1 is ", globvar1)
+                            countTextValues1 = countTextValues1 + countTextValues
                             print(xmlToDoc.toprettyxml())
                             textValueDom(4)
-                            globvar2 = globvar
-                            print("globvar1 is ", globvar2)
-                        # elif eventsByID == "1":
-                        #     print(xmlToDoc.toprettyxml())
-                        #     textValueDom(4)
-                        #     globvar2 = globvar
-                        #     print(globvar2)
-                            print("The total of globvars is ", globvar1 + globvar2)
-                            
+                            print("The instances of globvar2 in the local tag are ", globvar)
+                            globvar2 = globvar2 + globvar
+                            print("globvar2 is ", globvar2)
+                            countTextValues2 = countTextValues2 + countTextValues
+                            print("ALERT, ALERT, ALERT...", globvar1 + globvar2, " incidents were identified as potentially prone to LM attacks.")
+                        elif eventsByID in eventIDValues2:
+                            print(xmlToDoc.toprettyxml())
+                            textValueDom(4)
+                            print("The instances of globvar2 in the local tag are ", globvar)
+                            globvar2 = globvar2 + globvar
+                            print("globvar2 is ", globvar2)
+                            print("ALERT, ALERT, ALERT...", globvar2, " incidents were identified as potentially prone to LM attacks.")
+                        print((countTextValues1 + countTextValues2), "textValues were enumerated in total within this .evtx file.")
+                        print("There is a ", ((100 * (globvar1 + globvar2)) / (countTextValues1 + countTextValues2)), "% percent possibility of being affected from a Lateral Movement Attack.")
 
+                        
                         # print(xmlToDoc.toprettyxml())
                         # dom_elements = xmlToDoc.getElementsByTagName("Data")
                         # node1 = dom_elements[4]
