@@ -110,6 +110,8 @@ def Python_Evtx_Analyzer():
         countTextValues = 0
         countTextValues1 = 0
         countTextValues2 = 0
+        countTextValues3 = 0
+        countTextValues4 = 0
 
         def textValueDom(int):
             nonlocal globvar
@@ -180,15 +182,18 @@ def Python_Evtx_Analyzer():
                             print("globvar2 is ", globvar2)
                             countTextValues2 = countTextValues2 + countTextValues
                             print("ALERT, ALERT, ALERT...", globvar1 + globvar2, " incidents were identified as potentially prone to LM attacks.")
+                            print((countTextValues1 + countTextValues2), "textValues were enumerated in total within this .evtx file.")
+                            print("There is a ", ((100 * (globvar1 + globvar2)) / (countTextValues1 + countTextValues2)), "% percent possibility of being affected from a Lateral Movement Attack.")
                         elif eventsByID in eventIDValues2:
                             print(xmlToDoc.toprettyxml())
                             textValueDom(4)
                             print("The instances of globvar2 in the local tag are ", globvar)
                             globvar2 = globvar2 + globvar
                             print("globvar2 is ", globvar2)
+                            countTextValues3 = countTextValues3 + countTextValues
                             print("ALERT, ALERT, ALERT...", globvar2, " incidents were identified as potentially prone to LM attacks.")
-                        print((countTextValues1 + countTextValues2), "textValues were enumerated in total within this .evtx file.")
-                        print("There is a ", ((100 * (globvar1 + globvar2)) / (countTextValues1 + countTextValues2)), "% percent possibility of being affected from a Lateral Movement Attack.")
+                            print(countTextValues3, "textValues were enumerated in total within this .evtx file.")
+                            print("There is a ", ((100 * (globvar2)) / (countTextValues3)), "% percent possibility of being affected from a Lateral Movement Attack.")
 
                         
                         # print(xmlToDoc.toprettyxml())
