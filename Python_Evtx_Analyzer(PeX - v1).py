@@ -120,7 +120,12 @@ def Python_Evtx_Analyzer():
         countTextValues3 = 0
         countTextValues4 = 0
 
-        
+        # Function which handles minidom's xmlToDoc.getElementsByTagName() incorporated function.
+        # The main utilities of this custom chunk of code, is to extract the specified in through 
+        # the int argument .evtx element position, store it in node1 variable, and afterwards extract 
+        # the nodeValue included in node1.firstChild tag. Above that, the elements are counted based
+        # on their EventID int number into the myCount variable, which is upgraded by one every time 
+        # a new element of the specified tag is found. 
         def textValueDom(int):
             nonlocal globvar
             nonlocal countTextValues
