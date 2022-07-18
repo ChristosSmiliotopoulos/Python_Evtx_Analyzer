@@ -102,11 +102,15 @@ def Python_Evtx_Analyzer():
         # *.txt file's reading of lines and storing them in the list_of_lists variable.
         lines = a_file.read()
         list_of_lists = lines.splitlines()
-
+        
+        # The open() .txt file is closed. 
         a_file.close()
 
+        # The contents of the list_of_lists variable are printed on terminal.
         print(list_of_lists)
 
+        # The eight global variables that follow are used in the textValueDom(int) function and the if..else conditional statements 
+        # that deal with the manipulation, parsing and analyzing of the .evtx files.
         globvar = 0
         globvar1 = 0
         globvar2 = 0
@@ -116,6 +120,7 @@ def Python_Evtx_Analyzer():
         countTextValues3 = 0
         countTextValues4 = 0
 
+        
         def textValueDom(int):
             nonlocal globvar
             nonlocal countTextValues
