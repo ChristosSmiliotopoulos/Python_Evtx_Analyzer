@@ -126,6 +126,7 @@ def Python_Evtx_Analyzer():
         # the nodeValue included in node1.firstChild tag. Above that, the elements are counted based
         # on their EventID int number into the myCount variable, which is upgraded by one every time 
         # a new element of the specified tag is found. 
+
         def textValueDom(int):
             nonlocal globvar
             nonlocal countTextValues
@@ -152,6 +153,7 @@ def Python_Evtx_Analyzer():
 
         def print_globvar():
             print(globvar)
+
 
         eventIDValues1 = ['1', '2', '3', '4', '6', '7', '8', '9', '10', '11']
         eventIDValues2 = ['5']
@@ -184,13 +186,13 @@ def Python_Evtx_Analyzer():
                         if eventsByID in eventIDValues1:
                             print(xmlToDoc.toprettyxml())
                             textValueDom(10)
-                            print("The instances of globvar2 in the local tag are ", globvar)
+                            print("The instances of globvar1 (Data Name = CommandLine) in the local tag are ", globvar)
                             globvar1 = globvar1 + globvar
                             print("globvar1 is ", globvar1)
                             countTextValues1 = countTextValues1 + countTextValues
                             print(xmlToDoc.toprettyxml())
                             textValueDom(4)
-                            print("The instances of globvar2 in the local tag are ", globvar)
+                            print("The instances of globvar2 (Data Name = Image) in the local tag are ", globvar)
                             globvar2 = globvar2 + globvar
                             print("globvar2 is ", globvar2)
                             countTextValues2 = countTextValues2 + countTextValues
@@ -200,7 +202,7 @@ def Python_Evtx_Analyzer():
                         elif eventsByID in eventIDValues2:
                             print(xmlToDoc.toprettyxml())
                             textValueDom(4)
-                            print("The instances of globvar2 in the local tag are ", globvar)
+                            print("The instances of globvar2 (Data Name = Image) in the local tag are ", globvar)
                             globvar2 = globvar2 + globvar
                             print("globvar2 is ", globvar2)
                             countTextValues3 = countTextValues3 + countTextValues
