@@ -91,12 +91,15 @@ def Python_Evtx_Analyzer():
         else:
             print(xmlHeaderOutput)
 
-        # The lines of code up to countTextValues4 is responsible for reading the rule-based policy's filters in .txt form, 
-        # that is included in ruleBasedPolicy folder. The filters are enumerated, the lines are splitted and after the file
-        # reading is closed all the manipulated filtering info is stored in list_of_lists variable and printed in termina's 
-        # screen. 
+        # The lines of code up to variable countTextValues4 are responsible for reading the rule-based policy's filters in 
+        # .txt form, that is included in ruleBasedPolicy folder. The filters are enumerated, the lines are splitted and after 
+        # the file reading is closed the manipulated filtering info is stored into list_of_lists variable and printed on cmd 
+        # terminal's screen. 
+
+        # *.txt file opening.
         a_file = open("ruleBasedPolicy\RBPolicy.txt", "r")
 
+        # *.txt file's reading of lines and storing them in the list_of_lists variable.
         lines = a_file.read()
         list_of_lists = lines.splitlines()
 
