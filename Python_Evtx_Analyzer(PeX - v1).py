@@ -91,11 +91,11 @@ def Python_Evtx_Analyzer():
         else:
             print(xmlHeaderOutput)
 
-        # Counter variable will be used to count the suspicious for Lateral Movement attacks network traffic.
-        # Counter = 0
-        # globvar = 0
-
-        a_file = open("filters.txt", "r")
+        # The lines of code up to countTextValues4 is responsible for reading the rule-based policy's filters in .txt form, 
+        # that is included in ruleBasedPolicy folder. The filters are enumerated, the lines are splitted and after the file
+        # reading is closed all the manipulated filtering info is stored in list_of_lists variable and printed in termina's 
+        # screen. 
+        a_file = open("ruleBasedPolicy\RBPolicy.txt", "r")
 
         lines = a_file.read()
         list_of_lists = lines.splitlines()
