@@ -1,11 +1,10 @@
 # Python_Evtx_Analyzer(PeX - v1)
 
-The enclosed in this Github repository script, is a python analyzing scripting tool dubbed “Python_Evtx_Analyzer” (PeX - v1), which caters for the analysis of voluminous Sysmon logs, and therefore contributes to the identification of Lateral Movement events in a timely manner. With this portable and versatile chunk of code, the entries of Windows Event Logger and Sysmon .evtx files could be enumerated through dedicated filtering, to reveal the existence or not of possible Lateral Movement Attacks over Small Office Home Office (SOHO) Networks.
+The enclosed script in this Github repository, is a python analyzing scripting tool dubbed “Python_Evtx_Analyzer” (PeX - v1), which caters for the analysis of voluminous Sysmon logs, and therefore contributes to the identification of Lateral Movement (LM) events in a timely manner. With this portable and versatile chunk of code, the entries of Windows Event Logger and Sysmon .evtx files could be enumerated through dedicated filtering, to reveal the existence or not of possible Lateral Movement Attacks over Small Office Home Office (SOHO) Networks.
 
-PeX’s events identification is based on Lateral Movement-oriented features that were extracted from Sysmon’s pre-configured rules in the enclosed config.xml file, as presented in the published pre-printed paper entitled "Revisiting the detection of Lateral Movement through Sysmon". What makes PeX special is its ability to be fully customizable by Incident Response researching teams to analyse and identify any kind of logging activity captured by Sysmon, either normal or malicious. As a result, PeX can be used in the context of other researchers in this timely field as it is made publicly available as open source in Github.
- 
+PeX was developed to implement the proposed methodology presented in the published pre-printed paper entitled "Revisiting the detection of Lateral Movement through Sysmon" (Smiliotopoulos, C.; Barbatsalou, K.; Kambourakis, G. Revisiting the Detection of Lateral Movement through Sysmon. Preprints 2022, 2022070176 (doi: 10.20944/preprints202207.0176.v1), https://www.preprints.org/manuscript/202207.0176/v1), regarding the LM events identification and analyzing via Sysmon. As already mentioned, events identification is based on LM-oriented features that were extracted from Sysmon’s pre-configured rules in the enclosed config.xml file, as presented in the aforementioned paper. What makes PeX special is its ability to be fully customizable by Incident Response researching teams to analyse and identify any kind of logging activity captured by Sysmon, either normal or malicious. As a result, PeX can be used in the context of other researchers in this timely field as it is made publicly available as open source in Github.
 
-Along with PeX's (v1), the analyzer is initialized under the hood to identify the possibility of malicious Lateral Movement Attacks. All the associated filters are based on the Sysmon's EDR proposed policy in the aformentioned "Revisiting the detection of Lateral Movement through Sysmon" paper. The proposed EDR rule-based Sysmon's policy is also enclosed with PeX's repository as "config.xml" file. 
+As it concerns PeX's (v1) event filtering, the analyzer is initialized with rule-based features under the hood to identify the possibility of malicious LM existence. All the associated filters are based on the Sysmon's EDR proposed policy in the aformentioned "Revisiting the detection of Lateral Movement through Sysmon" paper . The proposed EDR rule-based Sysmon's policy is also enclosed with PeX's repository as "config.xml" file. 
 
 From an OS version’s perspective, the analyzer can run on all mainstream platforms, including Windows 10, MacOS Big Sur v11.6.5 and Ubuntu v22.04.
 
@@ -13,7 +12,7 @@ As a proof of concept, Pex was implemented with Python 3 on a VM Linux machine w
 
 The source code, along with the following: 
 
-		- PeX's supporting material, 
+		- PeX's supporting material (filtering rules included in the ruleBasedPolicy folder), 
 		
 		- Sysmon's "config.xml" file, 
 		
@@ -21,7 +20,11 @@ The source code, along with the following:
 		
 		- Evtx Demo - Terminal Executions folders and 
 		
-		- PeX's Readme.md file, 
+		- PeX's Readme.md file,
+
+		- the referenced paper's BibTex citation and 
+
+		- a folder with descriptive screenshots and a small video regarding the tool's functionality
 
 can be downloaded from the tool's Github link, https://github.com/ChristosSmiliotopoulos/Python_Evtx_Analyzer.git.
 
@@ -29,7 +32,7 @@ can be downloaded from the tool's Github link, https://github.com/ChristosSmilio
 
 In order to re-build the source code contained in this repository there are two possible ways:
 
-- Load it to the IDE of your choice (PyCharm is recommended, due to its undeniable characteristics that could not be
+- Load it to the IDE of your choice (PyCharm or VSCode are recommended, due to their undeniable characteristics that could not be
 ommitted, including among the many benefits smart code completion, on-the-fly error inspection with highlighting and 
 code refactoring). Import according to your IDE manual the referenced libraries in the main.py file, choose the relevant
 to your system Python version (Python 3.9.1 was the version upon which the analyzer was created) and try the analyzer to the 

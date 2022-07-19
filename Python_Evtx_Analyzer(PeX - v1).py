@@ -121,11 +121,11 @@ def Python_Evtx_Analyzer():
         countTextValues4 = 0
 
         # Function which handles minidom's xmlToDoc.getElementsByTagName() incorporated function.
-        # The main utilities of this custom chunk of code, is to extract the specified in through 
-        # the int argument .evtx element position, store it in node1 variable, and afterwards extract 
-        # the nodeValue included in node1.firstChild tag. Above that, the elements are counted based
-        # on their EventID int number into the myCount variable, which is upgraded by one every time 
-        # a new element of the specified tag is found. 
+        # The main utilities of this custom chunk of code, is to extract .evtx files element values 
+        # included in the the specified through the int argument tag position, store it in node1 
+        # variable, and afterwards extract the nodeValue included in node1.firstChild tag. Above that, 
+        # the elements are counted based on their EventID int number into the myCount variable, which 
+        # is upgraded by one every time a new element of the specified tag is found. 
 
         def textValueDom(int):
             nonlocal globvar
@@ -186,27 +186,27 @@ def Python_Evtx_Analyzer():
                         if eventsByID in eventIDValues1:
                             print(xmlToDoc.toprettyxml())
                             textValueDom(10)
-                            print("The instances of globvar1 (Data Name = CommandLine) in the local tag are ", globvar)
+                            print("The instances of ''Data Name = CommandLine'' element in the local tag are ", globvar)
                             globvar1 = globvar1 + globvar
-                            print("globvar1 is ", globvar1)
+                            print("In total, ", globvar1, "''Data Name = CommandLine'' elements were identified.")
                             countTextValues1 = countTextValues1 + countTextValues
                             print(xmlToDoc.toprettyxml())
                             textValueDom(4)
-                            print("The instances of globvar2 (Data Name = Image) in the local tag are ", globvar)
+                            print("The instances of ''Data Name = Image'' element in the local tag are ", globvar)
                             globvar2 = globvar2 + globvar
-                            print("globvar2 is ", globvar2)
+                            print("In total, ", globvar2, "''Data Name = Image'' elements were identified.")
                             countTextValues2 = countTextValues2 + countTextValues
-                            print("ALERT, ALERT, ALERT...", globvar1 + globvar2, " incidents were identified as potentially prone to LM attacks.")
+                            print("ALERT, ALERT, ALERT...", globvar1 + globvar2, " incidents in total were identified as potentially prone to LM attacks.")
                             print((countTextValues1 + countTextValues2), "textValues were enumerated in total within this .evtx file.")
                             print("There is a ", ((100 * (globvar1 + globvar2)) / (countTextValues1 + countTextValues2)), "% percent possibility of being affected from a Lateral Movement Attack.")
                         elif eventsByID in eventIDValues2:
                             print(xmlToDoc.toprettyxml())
                             textValueDom(4)
-                            print("The instances of globvar2 (Data Name = Image) in the local tag are ", globvar)
+                            print("The instances of ''Data Name = Image'' element in the local tag are ", globvar)
                             globvar2 = globvar2 + globvar
-                            print("globvar2 is ", globvar2)
+                            print("In total, ", globvar2, "''Data Name = Image'' elements were identified.")
                             countTextValues3 = countTextValues3 + countTextValues
-                            print("ALERT, ALERT, ALERT...", globvar2, " incidents were identified as potentially prone to LM attacks.")
+                            print("ALERT, ALERT, ALERT...", globvar2, " incidents in total were identified as potentially prone to LM attacks.")
                             print(countTextValues3, "textValues were enumerated in total within this .evtx file.")
                             print("There is a ", ((100 * (globvar2)) / (countTextValues3)), "% percent possibility of being affected from a Lateral Movement Attack.")
 
