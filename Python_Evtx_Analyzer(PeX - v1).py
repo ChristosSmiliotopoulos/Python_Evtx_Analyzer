@@ -128,18 +128,31 @@ def Python_Evtx_Analyzer():
         # is upgraded by one every time a new element of the specified tag is found. 
 
         def textValueDom(int):
+            # globvar variable stores element instances per tag and EventID.
             nonlocal globvar
+            # countTextValues variable stores the total amount of the elements examined by this function, either
+            # normal or suspicious.
             nonlocal countTextValues
             globvar = 0
             countTextValues = 0
+            # Counter variable is used to count the number of elements found per tag.
             Counter = 0
+            # myCount variable takes the values from Counter variable and implements them in a print() message function.
             myCount = int
+            # dom_elements is used by minidom to store all the elements taged as 'Data'.
             dom_elements = xmlToDoc.getElementsByTagName("Data")
+            # node1 imports only the specified per int argument element.
             node1 = dom_elements[int]
+            # text_node1 takes the firstChild of node1. The firstChild property returns the first child node of the selected 
+            # element. If the selected node has no children, this property returns NULL.
             text_node1 = node1.firstChild
+            # text_value1 stores the value of the text_node1 variable and implements it in a print() function.
             text_value1 = text_node1.nodeValue
             print(text_value1)
+            # countTextValues variable is updated per examined element.
             countTextValues +=1
+            # The for loop iterated the list_of_lists with the filters implemented in the previous lines of code and compares it
+            # per text_value1. If found Counter variable adds 1 and so as globvar does.
             for i in list_of_lists:
                 # if text_value1 == i or text_value2 == i:
                 if text_value1 == i:
@@ -154,7 +167,7 @@ def Python_Evtx_Analyzer():
         def print_globvar():
             print(globvar)
 
-
+        # 
         eventIDValues1 = ['1', '2', '3', '4', '6', '7', '8', '9', '10', '11']
         eventIDValues2 = ['5']
 
