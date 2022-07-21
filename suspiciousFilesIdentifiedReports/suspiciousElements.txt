@@ -1,5 +1,5 @@
 Python_Evtx_Analyzer (PeX - v1) - EDR Threat Analysis Report of: 
-2022-07-21 11:16:04
+2022-07-21 11:26:33
 
 The files that follow were identified as potentially suspicious for Lateral Movement behaviour.
 
@@ -16,11 +16,11 @@ whoami
 C:\Windows\System32\whoami.exe
 
 Starting Time/Date:
-2022-07-21 11:16:04
+2022-07-21 11:26:33
 
 Ending Time/Date:
-2022-07-21 11:16:04
+2022-07-21 11:26:33
 
 There is a 33.333333333333336% percent possibility of being affected from a Lateral Movement Attack (with reference to Sysmon EventIDs 1-4, 6-22).
 In total, 1 out of 18 ''Data Name = CommandLine'' elements were identified.
-In total, 5 out of 0''Data Name = Image'' elements were identified.
+In total, 5 out of 18''Data Name = Image'' elements were identified.
