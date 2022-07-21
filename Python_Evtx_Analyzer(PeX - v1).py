@@ -24,9 +24,11 @@
 from cgi import print_arguments
 import imp
 from itertools import count
+import datetime
 import mmap  # Python's memory-mapped file input and output (I/O) library.
 
-import argparse  # argparse library is a parser for extra command-line options, arguments and sub-commands. This will
+import argparse
+from opcode import opname  # argparse library is a parser for extra command-line options, arguments and sub-commands. This will
 # make "Python_Evtx_Analyzer (PeX - v1)" capable to incorporate argurment function capabilities on any Windows cmd or 
 # powershell, macOS/Linux terminal environment.
 
@@ -120,6 +122,8 @@ def Python_Evtx_Analyzer():
         countTextValues3 = 0
         countTextValues4 = 0
 
+        now = datetime.datetime.now()
+
         # Function which handles minidom's xmlToDoc.getElementsByTagName() incorporated function.
         # The main utilities of this custom chunk of code, is to extract .evtx files element values 
         # included in the the specified through the int argument tag position, store it in node1 
@@ -153,6 +157,10 @@ def Python_Evtx_Analyzer():
             countTextValues +=1
             # The for loop iterated the list_of_lists with the filters implemented in the previous lines of code and compares it
             # per text_value1. If found Counter variable adds 1 and so as globvar does.
+            # file = open("suspiciousFilesIdentified\suspiciousElements.txt", "a")
+            # file.write(".evtx file's analysis started at:\n")
+            # file.write(now.strftime("%Y-%m-%d %H:%M:%S"))
+            # file.close()
             for i in list_of_lists:
                 # if text_value1 == i or text_value2 == i:
                 if text_value1 == i:
@@ -163,7 +171,10 @@ def Python_Evtx_Analyzer():
                     print(myCount, " Lateral Movement events have been found in total!!!")
                     globvar +=1
                     # print(globvar)
-
+                    file = open("suspiciousFilesIdentified\suspiciousElements.txt", "a")
+                    file.write(i+"\n")
+                    file.close()
+                
         def print_globvar():
             print(globvar)
 
@@ -221,7 +232,7 @@ def Python_Evtx_Analyzer():
                             print("ALERT, ALERT, ALERT...", globvar1 + globvar2, " incidents in total were identified as potentially prone to LM attacks.")
                             # The total of all the identified elements either normal or suspicious are summed and printed.
                             print((countTextValues1 + countTextValues2), "textValues were enumerated in total within this .evtx file.")
-                            print("There is a ", ((100 * (globvar1 + globvar2)) / (countTextValues1 + countTextValues2)), "% percent possibility of being affected from a Lateral Movement Attack.")
+                            print("There is a ", ((100 * (globvar1 + globvar2)) / (countTextValues1 + countTextValues2)), "% percent possibility of being affected from a Lateral Movement Attack.") 
                         # if eventsByID is included in eventIDValues2 = ['5']
                         elif eventsByID in eventIDValues2:
                             # The examined tags are printed in terminal's screen.
@@ -239,6 +250,9 @@ def Python_Evtx_Analyzer():
                             # The total of all the identified elements either normal or suspicious are summed and printed.
                             print(countTextValues3, "textValues were enumerated in total within this .evtx file.")
                             print("There is a ", ((100 * (globvar2)) / (countTextValues3)), "% percent possibility of being affected from a Lateral Movement Attack.")
+        file = open("suspiciousFilesIdentified\suspiciousElements.txt", "a")
+        file.write("Christos rocks in python.....\n")
+        file.close()   
                             
         evtxBuffer.close()  # mmap() evtxBuffer is closed.
 
