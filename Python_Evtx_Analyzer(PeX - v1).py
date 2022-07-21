@@ -133,7 +133,9 @@ def Python_Evtx_Analyzer():
         now = datetime.datetime.now()
 
         file = open("suspiciousFilesIdentified\suspiciousElements.txt", "w")
-        file.write("This is the beginning\n")
+        file.write("Python_Evtx_Analyzer (PeX - v1) - EDR Threat Analysis Report of: \n")
+        file.write(now.strftime("%Y-%m-%d %H:%M:%S")+"\n\n")
+        file.write("The files that follow were identified as potentially suspicious for Lateral Movement behaviour.\n\n")
         file.close()
 
         # Function which handles minidom's xmlToDoc.getElementsByTagName() incorporated function.
@@ -181,7 +183,7 @@ def Python_Evtx_Analyzer():
                     globvar +=1
                     # print(globvar)
                     file = open("suspiciousFilesIdentified\suspiciousElements.txt", "a")
-                    file.write(i+"\n")
+                    file.write(i+"\n\n")
                     file.close()
                 
         def print_globvar():
@@ -269,10 +271,10 @@ def Python_Evtx_Analyzer():
         
         file = open("suspiciousFilesIdentified\suspiciousElements.txt", "a")
         file.write("Starting Time/Date:\n")
-        file.write(now.strftime("%Y-%m-%d %H:%M:%S")+"\n")
+        file.write(now.strftime("%Y-%m-%d %H:%M:%S")+"\n\n")
         file = open("suspiciousFilesIdentified\suspiciousElements.txt", "a")
         file.write("Ending Time/Date:\n")
-        file.write(now.strftime("%Y-%m-%d %H:%M:%S")+"\n")
+        file.write(now.strftime("%Y-%m-%d %H:%M:%S")+"\n\n")
         if eventsByID in eventIDValues1: 
             file.write("There is a " + str(result1) + "% percent possibility of being affected from a Lateral Movement Attack (with reference to Sysmon EventIDs 1-4, 6-22).\n")
             file.write("In total, " + str(globvar1) + " out of " + str(totatAnalyzedFiles1) + " ''Data Name = CommandLine'' elements were identified." + "\n")
