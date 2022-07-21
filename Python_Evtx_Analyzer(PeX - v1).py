@@ -21,6 +21,7 @@
 # Importing necessary python libraries
 # ======================================================================================================================
 
+from ast import Str
 from cgi import print_arguments
 import imp
 from itertools import count
@@ -28,7 +29,8 @@ import datetime
 import mmap  # Python's memory-mapped file input and output (I/O) library.
 
 import argparse
-from opcode import opname  # argparse library is a parser for extra command-line options, arguments and sub-commands. This will
+from opcode import opname
+from turtle import st  # argparse library is a parser for extra command-line options, arguments and sub-commands. This will
 # make "Python_Evtx_Analyzer (PeX - v1)" capable to incorporate argurment function capabilities on any Windows cmd or 
 # powershell, macOS/Linux terminal environment.
 
@@ -93,6 +95,7 @@ def Python_Evtx_Analyzer():
         else:
             print(xmlHeaderOutput)
 
+
         # The lines of code up to variable countTextValues4 are responsible for reading the rule-based policy's filters in 
         # .txt form, that is included in ruleBasedPolicy folder. The filters are enumerated, the lines are splitted and after 
         # the file reading is closed the manipulated filtering info is stored into list_of_lists variable and printed on cmd 
@@ -121,8 +124,17 @@ def Python_Evtx_Analyzer():
         countTextValues2 = 0
         countTextValues3 = 0
         countTextValues4 = 0
+        result1 = 0
+        result2 = 0
+        totatAnalyzedFiles1 = 0
+        totatAnalyzedFiles2 = 0
+        # result2 = str(result2)
 
         now = datetime.datetime.now()
+
+        file = open("suspiciousFilesIdentified\suspiciousElements.txt", "w")
+        file.write("This is the beginning\n")
+        file.close()
 
         # Function which handles minidom's xmlToDoc.getElementsByTagName() incorporated function.
         # The main utilities of this custom chunk of code, is to extract .evtx files element values 
@@ -157,10 +169,7 @@ def Python_Evtx_Analyzer():
             countTextValues +=1
             # The for loop iterated the list_of_lists with the filters implemented in the previous lines of code and compares it
             # per text_value1. If found Counter variable adds 1 and so as globvar does.
-            # file = open("suspiciousFilesIdentified\suspiciousElements.txt", "a")
-            # file.write(".evtx file's analysis started at:\n")
-            # file.write(now.strftime("%Y-%m-%d %H:%M:%S"))
-            # file.close()
+
             for i in list_of_lists:
                 # if text_value1 == i or text_value2 == i:
                 if text_value1 == i:
@@ -181,7 +190,6 @@ def Python_Evtx_Analyzer():
         # Both variables store the necessary for the .evtx files analyzing process Sysmon EventIDs
         eventIDValues1 = ['1', '2', '3', '4', '6', '7', '8', '9', '10', '11']
         eventIDValues2 = ['5']
-
 
         # ==============================================================================================================
 
@@ -218,8 +226,9 @@ def Python_Evtx_Analyzer():
                             print("In total, ", globvar1, "''Data Name = CommandLine'' elements were identified.")
                             # The total of all the examined elements is updated.
                             countTextValues1 = countTextValues1 + countTextValues
+                            print("countTextValues1 ", countTextValues1)
                             # The examined tags are printed in terminal's screen.
-                            print(xmlToDoc.toprettyxml())
+                            # print(xmlToDoc.toprettyxml())
                             # textValueDom(int) examines the 4th elements aka 'Image'
                             textValueDom(4)
                             print("The instances of ''Data Name = Image'' element in the local tag are ", globvar)
@@ -228,11 +237,14 @@ def Python_Evtx_Analyzer():
                             print("In total, ", globvar2, "''Data Name = Image'' elements were identified.")
                             # The total of all the examined elements is updated.
                             countTextValues2 = countTextValues2 + countTextValues
+                            print("countTextValues2 ", countTextValues2)
                             # The total of the identified suspicious files that were identified are summed and printed.
                             print("ALERT, ALERT, ALERT...", globvar1 + globvar2, " incidents in total were identified as potentially prone to LM attacks.")
                             # The total of all the identified elements either normal or suspicious are summed and printed.
                             print((countTextValues1 + countTextValues2), "textValues were enumerated in total within this .evtx file.")
                             print("There is a ", ((100 * (globvar1 + globvar2)) / (countTextValues1 + countTextValues2)), "% percent possibility of being affected from a Lateral Movement Attack.") 
+                            result1 = ((100 * (globvar1 + globvar2)) / (countTextValues1 + countTextValues2))
+                            totatAnalyzedFiles1 = (countTextValues1 + countTextValues2)
                         # if eventsByID is included in eventIDValues2 = ['5']
                         elif eventsByID in eventIDValues2:
                             # The examined tags are printed in terminal's screen.
@@ -250,10 +262,25 @@ def Python_Evtx_Analyzer():
                             # The total of all the identified elements either normal or suspicious are summed and printed.
                             print(countTextValues3, "textValues were enumerated in total within this .evtx file.")
                             print("There is a ", ((100 * (globvar2)) / (countTextValues3)), "% percent possibility of being affected from a Lateral Movement Attack.")
+                            result2 = ((100 * (globvar2)) / (countTextValues3))
+                            totatAnalyzedFiles2 = countTextValues3
+
+        # //////////////////////////////////////////////////////////.evtx File Lateral Movement Analysis Final Report//////////////////////////////////////////////////////////
+        
         file = open("suspiciousFilesIdentified\suspiciousElements.txt", "a")
-        file.write("Christos rocks in python.....\n")
+        file.write("Starting Time/Date:\n")
+        file.write(now.strftime("%Y-%m-%d %H:%M:%S")+"\n")
+        file = open("suspiciousFilesIdentified\suspiciousElements.txt", "a")
+        file.write("Ending Time/Date:\n")
+        file.write(now.strftime("%Y-%m-%d %H:%M:%S")+"\n")
+        if eventsByID in eventIDValues1: 
+            file.write("There is a " + str(result1) + "% percent possibility of being affected from a Lateral Movement Attack (with reference to Sysmon EventIDs 1-4, 6-22).\n")
+            file.write("In total, " + str(globvar1) + " out of " + str(totatAnalyzedFiles1) + " ''Data Name = CommandLine'' elements were identified." + "\n")
+            file.write("In total, " + str(globvar2) + " out of " + str(totatAnalyzedFiles2) + "''Data Name = Image'' elements were identified." + "\n")
+        elif eventsByID in eventIDValues2:
+            file.write("There is a " + str(result2) + "% percent possibility of being affected from a Lateral Movement Attack (with reference to Sysmon EventIDs 5).\n")
         file.close()   
-                            
+                    
         evtxBuffer.close()  # mmap() evtxBuffer is closed.
 
         endingTag = "</EventIDs>"  # All the .xml files will end with the "/EventIDs" tag.
