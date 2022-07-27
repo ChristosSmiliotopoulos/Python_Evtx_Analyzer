@@ -26,6 +26,9 @@ from cgi import print_arguments
 import imp
 from itertools import count
 import datetime
+import os
+import os.path
+
 import mmap  # Python's memory-mapped file input and output (I/O) library.
 
 import argparse
@@ -131,8 +134,14 @@ def Python_Evtx_Analyzer():
         # result2 = str(result2)
 
         now = datetime.datetime.now()
-
-        file = open("suspiciousFilesIdentifiedReports\\threatAnalysisReport.txt", "w")
+        timestamp = str(now.strftime("%Y%m%d_%H%M%S"))
+        os.chdir('suspiciousFilesIdentifiedReports')
+        cwd = os.getcwd()
+        name = 'threatAnalysisReport'
+        data_folder = os.path.join(cwd)
+        file_name = name + '_' + timestamp + '.txt' 
+        # file = open("suspiciousFilesIdentifiedReports\\threatAnalysisReport.txt", "w")
+        file = open(file_name, "w")
         file.write("Python_Evtx_Analyzer (PeX - v1) - EDR Threat Analysis Report of: \n")
         file.write(now.strftime("%Y-%m-%d %H:%M:%S")+"\n\n")
         file.write("The below files were identified as potentially suspicious for Lateral Movement behaviour.\n\n")
@@ -182,7 +191,8 @@ def Python_Evtx_Analyzer():
                     print(myCount, " Lateral Movement events have been found in total!!!")
                     globvar +=1
                     # print(globvar)
-                    file = open("suspiciousFilesIdentifiedReports\\threatAnalysisReport.txt", "a")
+                    # file = open("suspiciousFilesIdentifiedReports\\threatAnalysisReport.txt", "a")
+                    file = open(file_name, "a")
                     file.write(i+"\n\n")
                     file.close()
                 
@@ -269,10 +279,12 @@ def Python_Evtx_Analyzer():
 
         # //////////////////////////////////////////////////////////.evtx File Lateral Movement Analysis Final Report//////////////////////////////////////////////////////////
         
-        file = open("suspiciousFilesIdentifiedReports\\threatAnalysisReport.txt", "a")
+        # file = open("suspiciousFilesIdentifiedReports\\threatAnalysisReport.txt", "a")
+        file = open(file_name, "a")
         file.write("Starting Time/Date:\n")
         file.write(now.strftime("%Y-%m-%d %H:%M:%S")+"\n\n")
-        file = open("suspiciousFilesIdentifiedReports\\threatAnalysisReport.txt", "a")
+        # file = open("suspiciousFilesIdentifiedReports\\threatAnalysisReport.txt", "a")
+        file = open(file_name, "a")
         file.write("Ending Time/Date:\n")
         file.write(now.strftime("%Y-%m-%d %H:%M:%S")+"\n\n")
         if eventsByID in eventIDValues1: 
@@ -292,7 +304,9 @@ def Python_Evtx_Analyzer():
             outputFolder.write(endingTag)
         else:
             print(endingTag)
-
+        
+    print("####################### The location of the analysis report is: #######################")
+    print("#######################", data_folder, "#######################")
 
 # The basic argument that makes our Python_Evtx_Analyzer() main executable.
 if __name__ == '__main__':
