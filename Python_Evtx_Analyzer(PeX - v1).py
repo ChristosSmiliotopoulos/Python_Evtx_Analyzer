@@ -132,10 +132,10 @@ def Python_Evtx_Analyzer():
 
         now = datetime.datetime.now()
 
-        file = open("suspiciousFilesIdentifiedReports\suspiciousElements.txt", "w")
+        file = open("suspiciousFilesIdentifiedReports\\threatAnalysisReport.txt", "w")
         file.write("Python_Evtx_Analyzer (PeX - v1) - EDR Threat Analysis Report of: \n")
         file.write(now.strftime("%Y-%m-%d %H:%M:%S")+"\n\n")
-        file.write("The files that follow were identified as potentially suspicious for Lateral Movement behaviour.\n\n")
+        file.write("The below files were identified as potentially suspicious for Lateral Movement behaviour.\n\n")
         file.close()
 
         # Function which handles minidom's xmlToDoc.getElementsByTagName() incorporated function.
@@ -182,7 +182,7 @@ def Python_Evtx_Analyzer():
                     print(myCount, " Lateral Movement events have been found in total!!!")
                     globvar +=1
                     # print(globvar)
-                    file = open("suspiciousFilesIdentifiedReports\suspiciousElements.txt", "a")
+                    file = open("suspiciousFilesIdentifiedReports\\threatAnalysisReport.txt", "a")
                     file.write(i+"\n\n")
                     file.close()
                 
@@ -269,14 +269,14 @@ def Python_Evtx_Analyzer():
 
         # //////////////////////////////////////////////////////////.evtx File Lateral Movement Analysis Final Report//////////////////////////////////////////////////////////
         
-        file = open("suspiciousFilesIdentifiedReports\suspiciousElements.txt", "a")
+        file = open("suspiciousFilesIdentifiedReports\\threatAnalysisReport.txt", "a")
         file.write("Starting Time/Date:\n")
         file.write(now.strftime("%Y-%m-%d %H:%M:%S")+"\n\n")
-        file = open("suspiciousFilesIdentifiedReports\suspiciousElements.txt", "a")
+        file = open("suspiciousFilesIdentifiedReports\\threatAnalysisReport.txt", "a")
         file.write("Ending Time/Date:\n")
         file.write(now.strftime("%Y-%m-%d %H:%M:%S")+"\n\n")
         if eventsByID in eventIDValues1: 
-            file.write("There is a " + str(result1) + "% percent possibility of being affected from a Lateral Movement Attack (with reference to Sysmon EventIDs 1-4, 6-22).\n")
+            file.write("There is a " + str(result1) + "% possibility of being under an attack involving Lateral Movement (with reference to Sysmon EventIDs 1-4, 6-22).\n")
             file.write("In total, " + str(globvar1) + " out of " + str(totatAnalyzedFiles1) + " ''Data Name = CommandLine'' elements were identified." + "\n")
             file.write("In total, " + str(globvar2) + " out of " + str(totatAnalyzedFiles1) + "''Data Name = Image'' elements were identified." + "\n")
         elif eventsByID in eventIDValues2:
